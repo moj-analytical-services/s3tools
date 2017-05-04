@@ -2,4 +2,7 @@
 
 export(moj.s3.buckets)
 export(moj.s3.dir)
+export(moj.s3.fetch.files)
+export(s3.search)
 import(dplyr)
+importFrom(magrittr,"%>%")

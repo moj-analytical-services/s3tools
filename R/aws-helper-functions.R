@@ -1,10 +1,12 @@
 #' Finds out what buckets are available to you
 #'
+#' @param accessible Logial, accessible buckets only? FALSE to see all
+#'
 #' @return a data frame of buckets you have access to
 #' @export
 #' @examples moj.s3.buckets()
 #'
-moj.s3.buckets <- function(){
+moj.s3.buckets <- function(accessible=TRUE){
   buckets <- function (b) {
     b.list <- aws.s3::bucketlist()
     b.list <- b.list$Bucket
@@ -25,14 +27,11 @@ moj.s3.buckets <- function(){
     access = bucket.list %>% purrr::map_lgl('access'),
     stringsAsFactors = FALSE
   ) %>%
-    dplyr::filter(access == TRUE) %>%
+    dplyr::filter(access == accessible) %>%
     dplyr::select(bucket) -> accessable.buckets
 
   return(accessable.buckets)
 }
-
-
-
 
 
 #' Return path of all accessable files
@@ -45,7 +44,7 @@ moj.s3.buckets <- function(){
 #'
 #' @examples moj.s3.dir()
 #'
-moj.s3.dir <- function(){
+moj.s3.fetch.files <- function(){
 
   b.list<-
     as.character(moj.s3.buckets()$bucket)
@@ -86,5 +85,42 @@ moj.s3.dir <- function(){
   )
 }
 
+#' A directory function for s3
+#'
+#' @param current.path a string with the path of the folder to query
+#'
+#' @return list of directories
+#' @export moj.s3.dir
+#' @import dplyr
+#' @importFrom magrittr %>%
+#'
+#' @examples moj.s3.dir('directory')
+moj.s3.dir <- function(current.path=''){
+  #Get files
+  file.list <- moj.s3.fetch.files()
+
+  #if path doesn't end with / then add it
+  current.path <- ifelse(stringr::str_sub(current.path, -1)!='/',
+                         stringr::str_c(current.path,'/'), current.path)
+
+  current.path <- ifelse(current.path=='/', '', current.path)
+
+  message(current.path)
+
+  #Subset to input folder
+  file.list<-
+    file.list %>%
+    dplyr::filter(stringr::str_detect(path, current.path)) %>%
+    dplyr::mutate(path =
+                    stringr::str_sub(path,
+                                     start = stringr::str_length(current.path)+1))
+
+
+  #Make file free
+  file.tree <-
+    stringr::str_split(file.list$path, '/')
+
+  return(file.tree %>% purrr::map(1) %>% unlist() %>% unique())
+}
 
 

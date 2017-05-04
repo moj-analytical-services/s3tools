@@ -2,17 +2,19 @@
 % Please edit documentation in R/aws-helper-functions.R
 \name{moj.s3.dir}
 \alias{moj.s3.dir}
-\title{Return path of all accessable files}
+\title{A directory function for s3}
 \usage{
-moj.s3.dir()
+moj.s3.dir(current.path = "")
+}
+\arguments{
+\item{current.path}{a string with the path of the folder to query}
 }
 \value{
-data frame with path of all files available to you
+list of directories
 }
 \description{
-Return path of all accessable files
+A directory function for s3
 }
 \examples{
-moj.s3.dir()
-
+moj.s3.dir('directory')
 }

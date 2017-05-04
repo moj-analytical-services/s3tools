@@ -4,7 +4,10 @@
 \alias{moj.s3.buckets}
 \title{Finds out what buckets are available to you}
 \usage{
-moj.s3.buckets()
+moj.s3.buckets(accessible = TRUE)
+}
+\arguments{
+\item{accessible}{Logial, accessible buckets only? FALSE to see all}
 }
 \value{
 a data frame of buckets you have access to
