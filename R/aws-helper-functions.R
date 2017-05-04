@@ -4,9 +4,9 @@
 #'
 #' @return a data frame of buckets you have access to
 #' @export
-#' @examples moj.s3.buckets()
+#' @examples s3.buckets()
 #'
-moj.s3.buckets <- function(accessible=TRUE){
+s3.buckets <- function(accessible=TRUE){
   buckets <- function (b) {
     b.list <- aws.s3::bucketlist()
     b.list <- b.list$Bucket
@@ -42,12 +42,12 @@ moj.s3.buckets <- function(accessible=TRUE){
 #' @import dplyr
 #'
 #'
-#' @examples moj.s3.dir()
+#' @examples s3.fetch.files()
 #'
-moj.s3.fetch.files <- function(){
+s3.fetch.files <- function(){
 
   b.list<-
-    as.character(moj.s3.buckets()$bucket)
+    as.character(s3.buckets()$bucket)
 
 
   aws.s3.dir<-
@@ -90,14 +90,14 @@ moj.s3.fetch.files <- function(){
 #' @param current.path a string with the path of the folder to query
 #'
 #' @return list of directories
-#' @export moj.s3.dir
+#' @export s3.dir
 #' @import dplyr
 #' @importFrom magrittr %>%
 #'
-#' @examples moj.s3.dir('directory')
-moj.s3.dir <- function(current.path=''){
+#' @examples s3.dir('directory')
+s3.dir <- function(current.path=''){
   #Get files
-  file.list <- moj.s3.fetch.files()
+  file.list <- s3.fetch.files()
 
   #if path doesn't end with / then add it
   current.path <- ifelse(stringr::str_sub(current.path, -1)!='/',
