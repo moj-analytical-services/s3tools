@@ -1,3 +1,7 @@
 # s3.tools
-Collection of tools for working with S3 buckets. 
-Currently just an idea for future development.
+Tools for working with S3 buckets. 
+
+### Usage
+```r
+s3.dir('bucket/directory')
+```
