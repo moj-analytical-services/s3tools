@@ -61,7 +61,7 @@ s3_path_to_full_df <- function(path) {
 #' @param pattern a string -  a regular expression representing the search
 #'
 #' @return a list of tibbles
-#' #' @export 
+#' @export 
 #' 
 #' @examples  search_and_preview_dfs('temp\\d')
 search_and_preview_dfs <- function(pattern, maxreturns = 10) {
@@ -83,7 +83,7 @@ search_and_preview_dfs <- function(pattern, maxreturns = 10) {
   }
   
   paths %>% 
-    set_names(paths) %>%
+    purrr::set_names(paths) %>%
     purrr::map(s3_path_to_preview_df)
   
   

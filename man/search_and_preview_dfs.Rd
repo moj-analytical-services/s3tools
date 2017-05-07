@@ -11,7 +11,6 @@ search_and_preview_dfs(pattern, maxreturns = 10)
 }
 \value{
 a list of tibbles
-#' @export
 }
 \description{
 Preview the first few records of any dataset that matches a search
