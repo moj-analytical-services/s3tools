@@ -93,9 +93,9 @@ s3_dir <- function(current_path=''){
 #'
 #' @return a vector of matching paths
 #' @export
-#' @examples find_s3_path('temp\\d')
+#' @examples find_s3_paths('temp\\d')
 #'
-find_s3_path <- function(search_pattern){
+find_s3_paths <- function(search_pattern){
   
   all_files <- accessible_files_df()
   
