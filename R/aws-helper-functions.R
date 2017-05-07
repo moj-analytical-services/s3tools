@@ -60,7 +60,7 @@ accessible_files_df <- function(){
 #' @importFrom magrittr %>%
 #'
 #' @examples s3.dir('directory')
-s3.dir <- function(current_path=''){
+s3_dir <- function(current_path=''){
   #Get files
   file_list <- accessible_files_df()
 
