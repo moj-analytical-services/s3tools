@@ -4,10 +4,10 @@
 \alias{s3.dir}
 \title{A directory function for s3}
 \usage{
-s3.dir(current.path = "")
+s3.dir(current_path = "")
 }
 \arguments{
-\item{current.path}{a string with the path of the folder to query}
+\item{current_path}{a string with the path of the folder to query}
 }
 \value{
 list of directories
@@ -16,5 +16,5 @@ list of directories
 A directory function for s3
 }
 \examples{
-moj.s3.dir('directory')
+s3.dir('directory')
 }
