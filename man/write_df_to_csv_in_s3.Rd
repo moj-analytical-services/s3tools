@@ -7,7 +7,7 @@
 write_df_to_csv_in_s3(df, filename, bucket)
 }
 \arguments{
-\item{df}{- the dataframe you want to store in s£}
+\item{df}{- the dataframe you want to store in s3}
 
 \item{filename}{a string -  the full path of where you want to store the file in s3, including any directory names}
 

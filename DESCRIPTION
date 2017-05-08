@@ -12,7 +12,8 @@ Imports:
   stringr,
   dplyr,
   purrr,
-  gdata
+  gdata,
+  aws.s3
 Remotes: 
   cloudyr/aws.s3
 Suggests: knitr,

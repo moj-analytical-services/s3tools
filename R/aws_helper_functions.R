@@ -53,6 +53,7 @@ accessible_files_df <- function(){
 
   accessible_buckets() %>%
     purrr::map(aws.s3::get_bucket) %>%
+    purrr::keep(function(x) {length(x) > 0}) %>%
     purrr::map(bucket_contents_to_data_frame) %>%
     dplyr::bind_rows()
 }
