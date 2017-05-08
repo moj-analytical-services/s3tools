@@ -33,10 +33,10 @@ accessible_buckets <- function(accessible=TRUE){
 accessible_files_df <- function(){
 
   get_filename_nodir <- function(paths) {
-    strsplit(paths, "/") %>% 
+    strsplit(paths, "/") %>%
       purrr::map_chr(tail, n=1)
   }
-  
+
   bucket_contents_to_data_frame <- function (bucket_contents) {
     df <- bucket_contents %>%
       purrr::map(unclass) %>%
@@ -46,7 +46,7 @@ accessible_files_df <- function(){
       dplyr::mutate(size_readable = gdata::humanReadable(Size)) %>%
       dplyr::mutate(filename = get_filename_nodir(path)) %>%
       dplyr::select(filename, path, size_readable, dplyr::everything())
-    
+
     names(df) <- tolower(names(df))
     df
   }

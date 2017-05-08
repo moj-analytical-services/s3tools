@@ -12,8 +12,9 @@ Imports:
   stringr,
   dplyr,
   purrr,
-  gdata,
-  aws.s3
+  gdata
+Remotes: 
+  cloudyr/aws.s3
 Suggests: knitr,
     rmarkdown
 VignetteBuilder: knitr
