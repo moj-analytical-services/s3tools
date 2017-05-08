@@ -7,15 +7,15 @@
 #' @examples s3.buckets()
 #'
 accessible_buckets <- function(accessible=TRUE){
-  
+
   check_access <- function(bucket_name){
       suppressMessages(aws.s3::bucket_exists(bucket_name))[1]
   }
-  
+
   bucket_list <- aws.s3::bucketlist()
   bucket_list <- bucket_list$Bucket
   access <- purrr::map_lgl(bucket_list, check_access)
-  
+
   if (accessible) {
     return(bucket_list[access])
   } else {
@@ -33,18 +33,18 @@ accessible_buckets <- function(accessible=TRUE){
 accessible_files_df <- function(){
 
   bucket_contents_to_data_frame <- function (bucket_contents) {
-    df <- bucket_contents %>% 
+    df <- bucket_contents %>%
       purrr::map(unclass) %>%
       purrr::map(dplyr::as_data_frame) %>%
       dplyr::bind_rows() %>%
       dplyr::mutate(path = paste(Bucket, Key, sep = "/")) %>%
       dplyr::mutate(size_readable = gdata::humanReadable(Size)) %>%
       dplyr::select(path, size_readable, dplyr::everything())
-    
+
     names(df) <- tolower(names(df))
     df
   }
-  
+
   accessible_buckets() %>%
     purrr::map(aws.s3::get_bucket) %>%
     purrr::map(bucket_contents_to_data_frame) %>%
@@ -56,7 +56,7 @@ accessible_files_df <- function(){
 #' @param current_path a string with the path of the folder to query
 #'
 #' @return list of directories
-#' @export 
+#' @export
 #' @importFrom magrittr %>%
 #'
 #' @examples s3.dir('directory')
@@ -68,7 +68,7 @@ s3_dir <- function(current_path=''){
   current_path <- ifelse(stringr::str_sub(current_path, -1)!='/',
                          stringr::str_c(current_path,'/'), current_path)
 
-  current.path <- ifelse(current_path=='/', '', current_path)
+  current_path <- ifelse(current_path=='/', '', current_path)
 
   message(current_path)
 
@@ -96,11 +96,11 @@ s3_dir <- function(current_path=''){
 #' @examples find_s3_paths('temp\\d')
 #'
 find_s3_paths <- function(search_pattern){
-  
+
   all_files <- accessible_files_df()
-  
+
   all_files %>%
     dplyr::filter(stringr::str_detect(path, search_pattern)) %>%
     .$path
-  
+
 }
