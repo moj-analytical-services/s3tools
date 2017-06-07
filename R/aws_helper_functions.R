@@ -46,6 +46,7 @@ accessible_files_df <- function(){
       dplyr::mutate(size_readable = gdata::humanReadable(Size)) %>%
       dplyr::mutate(filename = get_filename_nodir(path)) %>%
       dplyr::select(filename, path, size_readable, dplyr::everything())
+    
 
     names(df) <- tolower(names(df))
     df
@@ -55,7 +56,10 @@ accessible_files_df <- function(){
     purrr::map(aws.s3::get_bucket) %>%
     purrr::keep(function(x) {length(x) > 0}) %>%
     purrr::map(bucket_contents_to_data_frame) %>%
-    dplyr::bind_rows()
+    dplyr::bind_rows()%>%
+    # Below: Putting here as not all buckets have owner, 
+    #        but parsing as list complicates data frame
+    dplyr::mutate(owner = as.character(owner)) 
 }
 
 #' A directory function for s3
