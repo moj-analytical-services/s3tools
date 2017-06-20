@@ -13,8 +13,10 @@ Imports:
   dplyr,
   purrr,
   gdata,
+  aws.signature,
   aws.s3
 Remotes: 
+  ministryofjustice/aws.signature@22881cc,
   cloudyr/aws.s3
 Suggests: knitr,
     rmarkdown
