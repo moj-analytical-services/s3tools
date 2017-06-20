@@ -16,7 +16,7 @@ separate_bucket_path <- function(path) {
 #' @examples df <- s3_read_path_to_df("alpha-moj-analytics-scratch/a/b/c/robins_temp.csv")
 s3_path_to_df <- function(path, head=TRUE) {
   p <- separate_bucket_path(path)
-  credentials <- aws.signature::get_credentials()
+  credentials <- suppressMessages(aws.signature::get_credentials())
   if (head) {
     credentials$refresh()
     ob <- aws.s3::get_object(p$object, p$bucket,  headers = list(Range='bytes=0-12000'))

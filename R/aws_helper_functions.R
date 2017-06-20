@@ -7,7 +7,7 @@
 #' @examples s3.buckets()
 #'
 accessible_buckets <- function(accessible=TRUE){
-  credentials <- aws.signature::get_credentials()
+  credentials <- suppressMessages(aws.signature::get_credentials())
 
   check_access <- function(bucket_name){
       credentials$refresh()
@@ -55,7 +55,7 @@ accessible_files_df <- function(){
     df
   }
 
-  credentials <- aws.signature::get_credentials()
+  credentials <- suppressMessages(aws.signature::get_credentials())
   credentials$refresh()
   accessible_buckets() %>%
     purrr::map(aws.s3::get_bucket) %>%

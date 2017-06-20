@@ -14,7 +14,7 @@ write_df_to_csv_in_s3 <- function(df, filename, bucket) {
   write.csv(df, rc)
 
   # upload the object to S3
-  credentials <- aws.signature::get_credentials()
+  credentials <- suppressMessages(aws.signature::get_credentials())
   credentials$refresh()
   aws.s3::put_object(file = rawConnectionValue(rc),
                      bucket = bucket,
