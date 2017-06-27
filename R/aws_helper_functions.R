@@ -7,14 +7,14 @@
 #' @examples s3.buckets()
 #'
 accessible_buckets <- function(accessible=TRUE){
-  credentials <- suppressMessages(aws.signature::get_credentials())
+  credentials <- suppressMessages(get_credentials())
 
   check_access <- function(bucket_name){
-      credentials$refresh()
+      refresh(credentials)
       suppressMessages(aws.s3::bucket_exists(bucket_name))[1]
   }
 
-  credentials$refresh()
+  refresh(credentials)
   bucket_list <- aws.s3::bucketlist()
   bucket_list <- bucket_list$Bucket
   access <- purrr::map_lgl(bucket_list, check_access)
@@ -55,8 +55,8 @@ accessible_files_df <- function(){
     df
   }
 
-  credentials <- suppressMessages(aws.signature::get_credentials())
-  credentials$refresh()
+  credentials <- suppressMessages(get_credentials())
+  refresh(credentials)
   accessible_buckets() %>%
     purrr::map(aws.s3::get_bucket) %>%
     purrr::keep(function(x) {length(x) > 0}) %>%
