@@ -55,8 +55,6 @@ accessible_files_df <- function(){
     df
   }
 
-  credentials <- suppressMessages(get_credentials())
-  refresh(credentials)
   accessible_buckets() %>%
     purrr::map(aws.s3::get_bucket) %>%
     purrr::keep(function(x) {length(x) > 0}) %>%

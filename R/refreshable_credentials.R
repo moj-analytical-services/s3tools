@@ -21,7 +21,7 @@ refreshable_credentials <- function (access_key,
 
     class(creds) <- "refreshable_credentials"
 
-    refresh_needed <- function () {
+    creds$refresh_needed <- function () {
 
         if (is.null(creds$expiry_time)) {
             # No expiration, so assume we don't need to refresh.
@@ -37,12 +37,13 @@ refreshable_credentials <- function (access_key,
 
     creds$refresh <- function () {
 
-        if (refresh_needed()) {
+        if (creds$refresh_needed()) {
             fresh <- refresh(current_time = current_time)
-            creds$access_key <<- fresh$access_key
-            creds$secret_key <<- fresh$secret_key
-            creds$token <<- fresh$token
-            creds$expiry_time <<- fresh$expiry_time
+            creds$access_key <- fresh$access_key
+            creds$secret_key <- fresh$secret_key
+            creds$token <- fresh$token
+            creds$expiry_time <- fresh$expiry_time
+            creds$refresh <- fresh$refresh
         }
 
         set_aws_credentials_env_vars(creds)

@@ -9,6 +9,7 @@ env_provider <- function(...) {
     }
 
     fetch_creds <- function(require_expiry = TRUE, current_time = Sys.time) {
+
         vars <- Sys.getenv(c("AWS_ACCESS_KEY_ID",
                              "AWS_SECRET_ACCESS_KEY",
                              "AWS_SESSION_TOKEN",
@@ -33,13 +34,20 @@ env_provider <- function(...) {
                                vars[["AWS_SESSION_TOKEN"]]))
         }
 
-        refreshable_credentials(vars[["AWS_ACCESS_KEY_ID"]],
-                                vars[["AWS_SECRET_ACCESS_KEY"]],
-                                vars[["AWS_SESSION_TOKEN"]],
-                                vars[["AWS_CREDENTIAL_EXPIRATION"]],
-                                refresh = fetch_creds,
-                                method = method,
-                                current_time = current_time)
+        creds <- refreshable_credentials(vars[["AWS_ACCESS_KEY_ID"]],
+                                         vars[["AWS_SECRET_ACCESS_KEY"]],
+                                         vars[["AWS_SESSION_TOKEN"]],
+                                         vars[["AWS_CREDENTIAL_EXPIRATION"]],
+                                         refresh = fetch_creds,
+                                         method = method,
+                                         current_time = current_time)
+
+        if (creds$refresh_needed()) {
+            Sys.unsetenv("AWS_ACCESS_KEY_ID")
+            return(get_credentials(current_time = current_time))
+        }
+
+        creds
     }
 
     provider <- list()
