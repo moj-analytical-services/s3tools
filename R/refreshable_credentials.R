@@ -1,8 +1,8 @@
 credentials <- function (access_key, secret_key, token = NULL) {
 
-    structure(list("access_key" = access_key,
-                   "secret_key" = secret_key,
-                   "token" = token),
+    structure(new.env("access_key" = access_key,
+                      "secret_key" = secret_key,
+                      "token" = token),
               class = "credentials")
 }
 
@@ -16,13 +16,9 @@ refreshable_credentials <- function (access_key,
 
     creds <- credentials(access_key, secret_key, token)
 
-    if (!missing(expiry)) {
-        creds$expiry_time <- expiry
-    }
+    creds$expiry_time <- expiry
 
     class(creds) <- "refreshable_credentials"
-
-    creds$expiry_time <- expiry
 
     refresh_needed <- function () {
 
@@ -41,7 +37,11 @@ refreshable_credentials <- function (access_key,
     creds$refresh <- function () {
 
         if (refresh_needed()) {
-            return(refresh(current_time = current_time))
+            fresh <- refresh(current_time = current_time)
+            creds$access_key <<- fresh$access_key
+            creds$secret_key <<- fresh$secret_key
+            creds$token <<- fresh$token
+            creds$expiry_time <<- fresh$expiry_time
         }
 
         set_aws_credentials_env_vars(creds)
