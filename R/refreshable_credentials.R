@@ -1,9 +1,10 @@
 credentials <- function (access_key, secret_key, token = NULL) {
 
-    structure(new.env("access_key" = access_key,
-                      "secret_key" = secret_key,
-                      "token" = token),
-              class = "credentials")
+    creds <- structure(new.env(), class = "credentials")
+    creds$access_key <- access_key
+    creds$secret_key <- secret_key
+    creds$token <- token
+    creds
 }
 
 refreshable_credentials <- function (access_key,
