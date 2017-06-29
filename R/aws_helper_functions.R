@@ -10,11 +10,11 @@ accessible_buckets <- function(accessible=TRUE){
   credentials <- suppressMessages(get_credentials())
 
   check_access <- function(bucket_name){
-      refresh(credentials)
+      suppressMessages(refresh(credentials))
       suppressMessages(aws.s3::bucket_exists(bucket_name))[1]
   }
 
-  refresh(credentials)
+  suppressMessages(refresh(credentials))
   bucket_list <- aws.s3::bucketlist()
   bucket_list <- bucket_list$Bucket
   access <- purrr::map_lgl(bucket_list, check_access)

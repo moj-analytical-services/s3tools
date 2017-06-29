@@ -18,12 +18,12 @@ s3_path_to_df <- function(path, head=TRUE) {
   p <- separate_bucket_path(path)
   credentials <- suppressMessages(get_credentials())
   if (head) {
-    refresh(credentials)
+    suppressMessages(refresh(credentials))
     ob <- aws.s3::get_object(p$object, p$bucket,  headers = list(Range='bytes=0-12000'))
     df <- read.csv(text = rawToChar(ob))
     df <- head(df)
   } else {
-    refresh(credentials)
+    suppressMessages(refresh(credentials))
     ob <- aws.s3::get_object(p$object, p$bucket)
     df <- read.csv(text = rawToChar(ob))
   }
