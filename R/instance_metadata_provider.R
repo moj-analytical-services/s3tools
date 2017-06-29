@@ -1,10 +1,11 @@
 instance_metadata_provider <- function (...) {
 
     role_name <- NULL
+    method <- "iam-role"
 
     log <- get_logger(...)
 
-    fetch_creds <- function (role = NULL) {
+    fetch_creds <- function (role = NULL, current_time = Sys.time) {
 
         if (is.null(role)) {
             role <- aws.ec2metadata::metadata$iam_role_names()
@@ -14,36 +15,31 @@ instance_metadata_provider <- function (...) {
             return(NULL)
         }
 
-        role_name <<- role
+        role_name <<- role[1L]
 
         metadata <- aws.ec2metadata::metadata$iam_role(role[1L])
 
-        list(
-            "access_key" = metadata$AccessKeyId,
-            "secret_key" = metadata$SecretAccessKey,
-            "token" = metadata$Token,
-            "expiry_time" = metadata$Expiration
-        )
+        refreshable_credentials(metadata$AccessKeyId,
+                                metadata$SecretAccessKey,
+                                metadata$Token,
+                                metadata$Expiration,
+                                refresh = fetch_creds,
+                                method = method,
+                                current_time = current_time)
     }
 
     provider <- list()
-    provider$method <- "iam-role"
+    provider$method <- method
     provider$load <- function (current_time = Sys.time) {
 
-        creds <- fetch_creds()
+        creds <- fetch_creds(current_time = current_time)
         if (is.null(creds)) {
             return(NULL)
         }
 
-        log(sprintf("Found credentials from IAM role: %s", role_name ))
+        log(sprintf("Found credentials from IAM role: %s", role_name))
 
-        refreshable_credentials(creds$access_key,
-                                creds$secret_key,
-                                creds$token,
-                                creds$expiry_time,
-                                refresh = fetch_creds,
-                                method = provider$method,
-                                current_time = current_time)
+        return(creds)
     }
 
     return(provider)
