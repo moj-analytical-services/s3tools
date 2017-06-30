@@ -10,7 +10,7 @@ shared_credential_provider <- function (profile_name, filename = NULL, ...) {
             filename <- default_credentials_file()
         }
 
-        creds <- try(aws.signature::read_credentials(filename)[[profile_name]])
+        creds <- try(aws.signature::read_credentials(filename)[[profile_name]], silent = TRUE)
 
         if (inherits(creds, "try-error")) {
             return(NULL)
