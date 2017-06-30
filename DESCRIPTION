@@ -14,7 +14,8 @@ Imports:
   purrr,
   gdata,
   aws.signature,
-  aws.s3
+  aws.s3,
+  aws.ec2metadata
 Remotes: 
   cloudyr/aws.signature,
   cloudyr/aws.s3
