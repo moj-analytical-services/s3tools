@@ -18,6 +18,8 @@ accessible_buckets <- function(accessible=TRUE){
   bucket_list <- aws.s3::bucketlist()
   bucket_list <- bucket_list$Bucket
   access <- purrr::map_lgl(bucket_list, check_access)
+  alpha <- grepl("alpha-", bucket_list) # Include only buckets in the alpha environment
+  access <- access & alpha
 
   if (accessible) {
     return(bucket_list[access])
