@@ -8,18 +8,35 @@
 #'
 accessible_buckets <- function(accessible=TRUE){
   credentials <- suppressMessages(get_credentials())
-
+  suppressMessages(refresh(credentials))
+  
   check_access <- function(bucket_name){
-      suppressMessages(refresh(credentials))
       suppressMessages(aws.s3::bucket_exists(bucket_name))[1]
   }
 
   suppressMessages(refresh(credentials))
-  bucket_list <- aws.s3::bucketlist()
+  
+  path = system.file("extdata", "bucket_blacklist.csv", package="s3tools")
+  df <- read.csv(path, stringsAsFactors = FALSE)
+  blacklist <- df$bucket
+  
+  bucket_list <-  aws.s3::bucketlist()
+  bucket_list <- bucket_list[!bucket_list$Bucket %in% blacklist,]
+  bucket_list <- bucket_list[grepl("alpha-", bucket_list$Bucket),]
+  
   bucket_list <- bucket_list$Bucket
+
   access <- purrr::map_lgl(bucket_list, check_access)
-  alpha <- grepl("alpha-", bucket_list) # Include only buckets in the alpha environment
-  access <- access & alpha
+  
+  # Calculate the number of cores
+  # no_cores <- parallel::detectCores()
+  
+  # Initiate cluster
+  # cl <- parallel::makeCluster(4)
+  # Now we just call the parallel version of lapply, parLapply:
+  # print(length(bucket_list))
+  # access <- parallel::parSapply(cl, bucket_list,  check_access)
+  # parallel::stopCluster(cl)
 
   if (accessible) {
     return(bucket_list[access])

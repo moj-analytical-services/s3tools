@@ -89,5 +89,4 @@ search_and_preview_dfs <- function(pattern, maxreturns = 10) {
     purrr::set_names(paths) %>%
     purrr::map(s3_path_to_preview_df)
 
-
 }
