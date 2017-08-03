@@ -1,5 +1,3 @@
-
-
 assign_s3_file_class <- function(path){
   file_ext <- tools::file_ext(path)
   attr(path, "class") <- file_ext
@@ -16,6 +14,8 @@ s3_path_to_df.default <- function(path, ...){
   file_location <- s3_download_temp_file(path, ...)
   message(stringr::str_c('your file is available at: ', file_location))
   rstudioapi::sendToConsole(stringr:::str_interp('\'${file_location}\''), execute = FALSE)
+  file_location
+
 }
 
 ' Read a file from S3, using the full path to the file including the bucketname
@@ -26,7 +26,7 @@ s3_path_to_df.default <- function(path, ...){
 #'
 #'
 #' @examples df <- s3_read_path_to_df("alpha-moj-analytics-scratch/a/b/c/robins_temp.csv")
-s3_path_to_df.csv <- function(path, head=TRUE, ...) {
+s3_path_to_df.csv <- function(path, ...) {
   message('using csv (or similar) method, reading directly to R supported')
   
   p <- separate_bucket_path(path)
@@ -50,7 +50,7 @@ s3_path_to_df.tsv <- function(path, ...){
 }
 
 
-s3_path_to_df.xlsx <- function(path, head, ...){
+s3_path_to_df.xlsx <- function(path, ..., head){
   message('using readxl package direct read is possible')
   
   if(is.logical(head) && head){
@@ -62,7 +62,7 @@ s3_path_to_df.xlsx <- function(path, head, ...){
   message(stringr:::str_c('Temp file saved to: ', file_location))
   
   
-  df <- readxl::read_excel(file_location, ...) 
+  df <- readxl::read_excel(path=file_location, ...) 
   
   tibble::as_data_frame(df)
 }
