@@ -15,8 +15,8 @@ separate_bucket_path <- function(path) {
 #'
 #'
 #' @examples df <- s3_read_path_to_df("alpha-moj-analytics-scratch/a/b/c/robins_temp.csv")
-s3_path_to_preview_df <- function(path) {
-  s3_path_to_df(path)
+s3_path_to_preview_df <- function(path, ...) {
+  s3_path_to_df(path, head=TRUE, ...)
 }
 
 

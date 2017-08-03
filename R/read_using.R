@@ -9,13 +9,6 @@
 #'
 #' @examples s3tools:::read_using(FUN=readxl::read_excel, path="alpha-test-team/mpg.xlsx")
 read_using <- function(FUN, ..., path){
-  
-  tmp <- tempfile(fileext = paste0(".", tools::file_ext(path)))
-  p <- separate_bucket_path(path)
-  credentials <- suppressMessages(get_credentials())
-  
-  r <- save_object(bucket = p$bucket, object = p$object, file = tmp)
-
-  
+  tmp <- s3_download_temp_file(path)
   return(FUN(tmp, ...))
 }

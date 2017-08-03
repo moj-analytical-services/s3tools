@@ -4,7 +4,7 @@
 \alias{s3_path_to_preview_df}
 \title{Preview the first 5 rows of a file from S3, using the full path to the file including the bucketname}
 \usage{
-s3_path_to_preview_df(path)
+s3_path_to_preview_df(path, ...)
 }
 \arguments{
 \item{path}{a string -  the full path to the file including the bucketname}

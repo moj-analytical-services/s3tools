@@ -75,7 +75,7 @@ knitr::kable(df[, c("path", "size_readable")])
 
 If you know the full path that you'd like to access, you can read the file as follows:
 
-```{r}
+```{r, include=TRUE, eval=FALSE}
 df <-s3tools::s3_path_to_full_df("alpha-moj-analytics-scratch/my_folder/10mb_random.csv")
 print(head(df))
 ```
@@ -83,7 +83,7 @@ print(head(df))
 
 If the file is very large, and you want to preview it before having to transfer it, you can do this:
 
-```{r}
+```{r, include=TRUE, eval=FALSE}
 df <- s3tools::s3_path_to_preview_df("alpha-moj-analytics-scratch/my_folder/10mb_random.csv")
 print(df)
 ```
