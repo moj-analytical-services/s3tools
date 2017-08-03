@@ -11,6 +11,8 @@ s3_path_to_df <- function(path, ...){
 
 s3_path_to_df.default <- function(path, ...){
   message('s3tools cannot parse this file automatically')
+  message('If you want to specify your own reading function see s3tools::read_using()')
+  message('or use the file path provided by this function')
   file_location <- s3_download_temp_file(path, ...)
   message(stringr::str_c('your file is available at: ', file_location))
   rstudioapi::sendToConsole(stringr:::str_interp('\'${file_location}\''), execute = FALSE)
