@@ -40,12 +40,12 @@ s3_path_to_df.csv <- function(path, ..., head) {
   if (head) {
     suppressMessages(refresh(credentials))
     ob <- aws.s3::get_object(p$object, p$bucket,  headers = list(Range='bytes=0-12000'))
-    df <- read.csv(text = rawToChar(ob))
+    df <- read.csv(text = rawToChar(ob), stringsAsFactors = FALSE)
     df <- head(df)
   } else {
     suppressMessages(refresh(credentials))
     ob <- aws.s3::get_object(p$object, p$bucket)
-    df <- read.csv(text = rawToChar(ob))
+    df <- read.csv(text = rawToChar(ob), stringsAsFactors = FALSE)
   }
   tibble::as_data_frame(df)
 }
