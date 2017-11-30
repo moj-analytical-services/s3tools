@@ -8,10 +8,10 @@
 #' @export
 #'
 #' @examples write_df_to_csv_in_s3(df, "my_folder/my_csv.csv", "alpha-moj-analytics-scratch")
-write_df_to_csv_in_s3 <- function(df, filename, bucket) {
+write_df_to_csv_in_s3 <- function(df, filename, bucket, ...) {
   # write to an in-memory raw connection
   rc <- rawConnection(raw(0), "r+")
-  write.csv(df, rc)
+  write.csv(df, rc, ...)
 
   # upload the object to S3
   credentials <- suppressMessages(get_credentials())
