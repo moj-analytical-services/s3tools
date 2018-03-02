@@ -16,10 +16,11 @@ Imports:
   aws.signature,
   aws.s3,
   aws.ec2metadata
-Remotes: 
+Remotes:
   cloudyr/aws.signature,
   cloudyr/aws.s3,
   cloudyr/aws.ec2metadata
 Suggests: knitr,
-    rmarkdown
+    rmarkdown,
+    testthat
 VignetteBuilder: knitr
