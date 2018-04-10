@@ -1,6 +1,6 @@
 Package: s3tools
 Title: Tools to help explore s3
-Version: 0.0.2
+Version: 0.0.3
 Authors@R: c(person("Will", "Bowditch", email = "william.bowditch@digital.justice.gov.uk", role = c("aut")),person("Robin", "Linacre", email = "Robin.Linacre@digital.justice.gov.uk", role = c("aut", "cre")))
 Description: Tools to help explore Amazon s3
 Depends: R (>= 3.3.2)
