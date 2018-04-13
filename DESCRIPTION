@@ -15,7 +15,10 @@ Imports:
   gdata,
   aws.signature,
   aws.s3,
-  aws.ec2metadata
+  aws.ec2metadata,
+  jsonlite,
+  httr,
+  digest
 Remotes:
   cloudyr/aws.signature,
   cloudyr/aws.s3,
