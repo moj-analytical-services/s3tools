@@ -4,12 +4,12 @@
 \alias{s3_path_to_df}
 \title{Read data from s3 with automatic processing}
 \usage{
-s3_path_to_df(path, ...)
+s3_path_to_df(s3_path, ...)
 }
 \arguments{
-\item{path}{path to the s3 file bucket/folder/file.csv}
-
 \item{...}{arguemtns passed to read.csv or read_excel.}
+
+\item{path}{path to the s3 file bucket/folder/file.csv}
 }
 \value{
 dataframe

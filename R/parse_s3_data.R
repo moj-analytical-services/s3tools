@@ -7,8 +7,8 @@
 #'
 #'
 #' @examples df <- s3_read_path_to_df("alpha-moj-analytics-scratch/a/b/c/robins_temp.csv")
-s3_path_to_preview_df <- function(path, ...) {
-  s3_path_to_df(path, head=TRUE, ...)
+s3_path_to_preview_df <- function(s3_path, ...) {
+  s3_path_to_df(s3_path, head=TRUE, ...)
 }
 
 
@@ -30,6 +30,6 @@ s3_path_to_preview_df <- function(path, ...) {
 #' @examples df <- s3_read_path_to_df("alpha-moj-analytics-scratch/folder/file.xls")
 #' @examples df <- s3_read_path_to_df("alpha-moj-analytics-scratch/folder/file.xls", sheet = 1)
 #' @examples filelocation <- s3_read_path_to_df("alpha-moj-analytics-scratch/folder/file.png")
-s3_path_to_full_df <- function(path, ...) {
-  s3_path_to_df(path, head=FALSE, ...)
+s3_path_to_full_df <- function(s3_path, ...) {
+  s3_path_to_df(s3_path, head=FALSE, ...)
 }

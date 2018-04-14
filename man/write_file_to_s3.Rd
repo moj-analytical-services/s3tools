@@ -4,16 +4,16 @@
 \alias{write_file_to_s3}
 \title{Write a file to s3}
 \usage{
-write_file_to_s3(local_file_path, s3_file_path, bucket, overwrite = FALSE)
+write_file_to_s3(local_file_path, s3_path, overwrite = FALSE)
 }
 \arguments{
 \item{local_file_path}{- the file you want to upload to s3}
 
+\item{overwrite}{boolean - overwrite the file if it already exists}
+
 \item{s3_file_path}{a string -  the full path of where you want to store the file in s3, including any directory names, but excluding the bucket name}
 
 \item{bucket}{a string - the name of the bucket you want to store the file in}
-
-\item{overwrite}{boolean - overwrite the file if it already exists}
 }
 \value{
 Returns nothing
@@ -22,5 +22,5 @@ Returns nothing
 Write a file to s3
 }
 \examples{
-local_file_path("myfiles/mydata.csv", "my_folder/my_csv.csv", "alpha-moj-analytics-scratch")
+local_file_path("myfiles/mydata.csv", "alpha-everyone/delete/my_csv.csv")
 }

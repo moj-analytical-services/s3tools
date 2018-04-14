@@ -3,6 +3,7 @@
 export(accessible_buckets)
 export(download_file_from_s3)
 export(get_credentials)
+export(list_files_in_buckets)
 export(read_using)
 export(s3_path_to_full_df)
 export(s3_path_to_preview_df)

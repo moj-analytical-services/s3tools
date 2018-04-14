@@ -16,9 +16,9 @@ assign_s3_file_class <- function(path){
 #'
 #' @examples s3tools::s3_path_to_full_df("alpha-test-team/mpg.csv")
 #' @examples s3tools::s3_path_to_preview_df("alpha-test-team/mpg.csv")
-s3_path_to_df <- function(path, ...){
-  path <- assign_s3_file_class(path)
-  UseMethod("s3_path_to_df", path)
+s3_path_to_df <- function(s3_path, ...){
+  s3_path <- assign_s3_file_class(s3_path)
+  UseMethod("s3_path_to_df", s3_path)
 }
 
 s3_path_to_df.default <- function(path, ...){
@@ -26,8 +26,8 @@ s3_path_to_df.default <- function(path, ...){
   message('If you want to specify your own reading function see s3tools::read_using()')
   message('or use the file path provided by this function')
   file_location <- s3_download_temp_file(path, ...)
-  message(stringr::str_c('your file is available at: ', file_location))
-  rstudioapi::sendToConsole(stringr:::str_interp('\'${file_location}\''), execute = FALSE)
+  message(paste0('your file is available at: ', file_location))
+  message(paste0("\'", file_location, "'"), execute = FALSE)
   file_location
 }
 
@@ -62,7 +62,7 @@ s3_path_to_df.xlsx <- function(path, ..., head){
     message('Preview not supported for Excel files')
   }
   file_location <- s3_download_temp_file(path)
-  message(stringr:::str_c('Temp file saved to: ', file_location))
+  message(paste0('Temp file saved to: ', file_location))
   
   df <- tryCatch({
           readxl::read_excel(path=file_location, ...)

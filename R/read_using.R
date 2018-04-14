@@ -7,8 +7,8 @@
 #' @return whatever the function returns
 #' @export 
 #'
-#' @examples s3tools:::read_using(FUN=readxl::read_excel, path="alpha-test-team/mpg.xlsx")
-read_using <- function(FUN, path, ...){
-  tmp <- s3_download_temp_file(path)
+#' @examples s3tools:::read_using(FUN=readxl::read_excel, s3_path="alpha-test-team/mpg.xlsx")
+read_using <- function(FUN, s3_path, ...){
+  tmp <- s3_download_temp_file(s3_path)
   return(FUN(tmp, ...))
 }

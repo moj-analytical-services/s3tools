@@ -1,12 +1,19 @@
-#' Return a dataframe all accessable files, including full path and filesize information
-#' Note:  The listing includes folders as well as files - this enables us to derive a recursive dir structure
+#' Return a dataframe of accessable files, including full path and filesize information
+#' Note:  The listing includes folders as well as files
 #'
-#' @param bucket_filter return only buckets that match this character vector of bucket names 
+#' @param bucket_filter return only buckets that match this character vector of bucket names e.g. "alpha-everyone"
+#' @param prefix filter files which begin with this prefix e.g. 'my_folder/'
+#' @param path_only boolean - return the accessible paths only, as a character vector
 #'
-#' @return data frame (tbl_df) with path of all files available to you in S3.
+#' @export
+#' @return data frame with path of all files available to you in S3.
 #' @examples accessible_files_df()
 #'
-accessible_files_df <- function(bucket_filter=NULL) {
+list_files_in_buckets <- function(bucket_filter=NULL, prefix=NULL, path_only=FALSE) {
+  
+  if (is.null(bucket_filter)) {
+    stop("You must provide one or more buckets e.g. accessible_files_df('alpha-everyone')  This function will list their contents")
+  }
   
   ab <- accessible_buckets()
   
@@ -18,10 +25,18 @@ accessible_files_df <- function(bucket_filter=NULL) {
   
   if (length(no_access) > 0) {
     no_access_str <- paste(no_access, collapse = ", ")
-    stop(paste("You don't have access to ", no_access_str))
+    stop(paste("You asked to list some buckets you don't have access to: ", no_access_str))
   }
   
-  af <- do.call(rbind, lapply(ab, aws.s3::get_bucket_df))
+  if (is.null(prefix)) {
+    af <- do.call(rbind, lapply(ab, aws.s3::get_bucket_df))
+  } else {
+    af <- do.call(rbind, lapply(ab, aws.s3::get_bucket_df, prefix=prefix))
+  }
+  
+  if (nrow(af)==0) {
+    return(NULL)
+  }
   
   cols_to_keep <- c("Key", "LastModified","ETag","Size","StorageClass","Bucket")
   af <- af[, cols_to_keep]
@@ -41,7 +56,11 @@ accessible_files_df <- function(bucket_filter=NULL) {
   
   af <- af[,c(start_cols, end_cols)]
   
-  af
+  if (path_only) {
+    return(af$path)
+  } else {
+    return(af)
+  }
   
 }
 

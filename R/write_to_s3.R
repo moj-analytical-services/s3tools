@@ -7,8 +7,8 @@
 #' @return Returns nothing
 #' @export
 #'
-#' @examples write_df_to_csv_in_s3(df, "my_folder/my_csv.csv", "alpha-moj-analytics-scratch")
-write_df_to_csv_in_s3 <- function(df, file_path, bucket, overwrite=FALSE, ...) {
+#' @examples write_df_to_csv_in_s3(df, "alpha-everyone/delete/my_csv.csv")
+write_df_to_csv_in_s3 <- function(df, s3_path, overwrite=FALSE, ...) {
   # write to an in-memory raw connection
   rc <- rawConnection(raw(0), "r+")
   write.csv(df, rc, ...)
@@ -17,11 +17,13 @@ write_df_to_csv_in_s3 <- function(df, file_path, bucket, overwrite=FALSE, ...) {
   credentials <- suppressMessages(get_credentials())
   suppressMessages(refresh(credentials))
   
-  if (overwrite || !(s3_file_exists(bucket, file_path))) {
+  p <- separate_bucket_path(s3_path)
+  
+  if (overwrite || !(s3_file_exists(s3_path))) {
       
     return(aws.s3::put_object(file = rawConnectionValue(rc),
-                       bucket = bucket,
-                       object = file_path,
+                       bucket = p$bucket,
+                       object = p$object,
                        headers = c('x-amz-server-side-encryption' = 'AES256')))
   } else {
     stop("File already exists and you haven't set overwrite = TRUE, stopping")
@@ -42,17 +44,19 @@ write_df_to_csv_in_s3 <- function(df, file_path, bucket, overwrite=FALSE, ...) {
 #' @return Returns nothing
 #' @export
 #'
-#' @examples local_file_path("myfiles/mydata.csv", "my_folder/my_csv.csv", "alpha-moj-analytics-scratch")
-write_file_to_s3 <- function(local_file_path, s3_file_path, bucket, overwrite=FALSE) {
+#' @examples local_file_path("myfiles/mydata.csv", "alpha-everyone/delete/my_csv.csv")
+write_file_to_s3 <- function(local_file_path, s3_path, overwrite=FALSE) {
 
   credentials <- suppressMessages(get_credentials())
   suppressMessages(refresh(credentials))
   
-  if (overwrite || !(s3_file_exists(bucket, s3_file_path))) {
+  p <- separate_bucket_path(s3_path)
+  
+  if (overwrite || !(s3_file_exists(s3_path))) {
     
     return(aws.s3::put_object(file = local_file_path,
-                       bucket = bucket,
-                       object = s3_file_path,
+                       bucket = p$bucket,
+                       object = p$object,
                        headers = c('x-amz-server-side-encryption' = 'AES256')))
   } else {
     stop("File already exists and you haven't set overwrite = TRUE, stopping")

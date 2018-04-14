@@ -21,6 +21,15 @@ test_that("Test reading using read_using", {
   expect_true(test1)
 })
 
+test_that("Test reading xlsx", {
+  iris_s3 <- s3tools::s3_path_to_full_df('alpha-everyone/s3tools_tests/iris_base.xlsx')
+  iris_s3 <- as.data.frame(iris_s3)
+  iris$Species <- as.character(iris$Species)
+  test1 <- all.equal(iris, iris_s3)
+  expect_true(test1)
+  
+})
+
 
 test_that("Test downloading file using download_file_from_s3", {
   file_name <- tempfile()

@@ -2,9 +2,9 @@
 % Please edit documentation in R/download_file_from_s3.R
 \name{download_file_from_s3}
 \alias{download_file_from_s3}
-\title{Read from S3 using a particular function}
+\title{Download a file from s3 to somewhere in your home directory}
 \usage{
-download_file_from_s3(s3_path, local_path)
+download_file_from_s3(s3_path, local_path, overwrite = FALSE)
 }
 \arguments{
 \item{s3_path}{character - the full path to the file in s3 e.g. alpha-everyone/iris.csv}
@@ -14,8 +14,8 @@ download_file_from_s3(s3_path, local_path)
 \item{overwrite}{- boolean - if file exists locally, overwrite?}
 }
 \description{
-Read from S3 using a particular function
+Download a file from s3 to somewhere in your home directory
 }
 \examples{
-s3tools:::download_file_from_s3()
+s3tools:::download_file_from_s3("alpha-everyone/iris.csv", "iris.csv", overwrit =TRUE)
 }
