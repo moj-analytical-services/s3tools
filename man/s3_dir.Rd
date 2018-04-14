@@ -2,9 +2,10 @@
 % Please edit documentation in R/aws_helper_functions.R
 \name{s3_dir}
 \alias{s3_dir}
-\title{A directory function for s3}
+\title{A directory function for s3
+Returns the contents of the given path, including files and directories}
 \usage{
-s3_dir(current_path = "")
+s3_dir(current_path = NULL)
 }
 \arguments{
 \item{current_path}{a string with the path of the folder to query}
@@ -14,7 +15,8 @@ list of directories
 }
 \description{
 A directory function for s3
+Returns the contents of the given path, including files and directories
 }
 \examples{
-s3.dir('directory')
+s3_dir('directory')
 }

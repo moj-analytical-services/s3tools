@@ -42,35 +42,3 @@ s3_path_to_preview_df <- function(path, ...) {
 s3_path_to_full_df <- function(path, ...) {
   s3_path_to_df(path, head=FALSE, ...)
 }
-
-#' Preview the first few records of any dataset that matches a search
-#'
-#' @param pattern a string -  a regular expression representing the search
-#'
-#' @return a list of tibbles
-#' @export
-#'
-#' @examples  search_and_preview_dfs('temp\\d')
-search_and_preview_dfs <- function(pattern, maxreturns = 10) {
-  paths <- find_s3_paths(pattern)
-  
-  bool <- stringr::str_detect(paths, "\\.tsv$|\\.csv$|\\.txt$")
-  
-  if (!(all(bool))) {
-    failures <- paths[!(bool)]
-    failures <- paste(failures, collapse=", ")
-    warning(stringr::str_interp("Rejected the following files because they don't look like tabular data: ${paths[!bool]}"))
-  }
-  paths <- paths[bool]
-  
-  num_paths <- length(paths)
-  if (num_paths > maxreturns) {
-    paths <- paths[1:maxreturns]
-    warning(stringr::str_interp("Found ${num_paths} paths, previewing only the first ${maxreturns}.  You may use the optional maxreturns argument to increase this number."))
-  }
-  
-  paths %>%
-    purrr::set_names(paths) %>%
-    purrr::map(s3_path_to_preview_df)
-  
-}

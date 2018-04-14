@@ -13,7 +13,6 @@ assign_s3_file_class <- function(path){
 #' @param ...  arguemtns passed to read.csv or read_excel. 
 #'
 #' @return dataframe
-#' @export
 #'
 #' @examples s3tools::s3_path_to_full_df("alpha-test-team/mpg.csv")
 #' @examples s3tools::s3_path_to_preview_df("alpha-test-team/mpg.csv")
@@ -47,7 +46,7 @@ s3_path_to_df.csv <- function(path, ..., head) {
     ob <- aws.s3::get_object(p$object, p$bucket)
     df <- read.csv(text = rawToChar(ob), stringsAsFactors = FALSE)
   }
-  tibble::as_data_frame(df)
+  
 }
 
 s3_path_to_df.tsv <- function(path, ...){
@@ -56,14 +55,25 @@ s3_path_to_df.tsv <- function(path, ...){
 
 
 s3_path_to_df.xlsx <- function(path, ..., head){
-  message('using readxl package direct read is possible')
+  
   if(is.logical(head) && head){
     message('Preview not supported for Excel files')
   }
   file_location <- s3_download_temp_file(path)
   message(stringr:::str_c('Temp file saved to: ', file_location))
-  df <- readxl::read_excel(path=file_location, ...) 
-  tibble::as_data_frame(df)
+  
+  df <- tryCatch({
+          readxl::read_excel(path=file_location, ...)
+          },
+          error= function(cond){
+             message("Attempted to read file using the readxl package, but it is not installed.  ")
+             message("You can install this package by running install.packages('readxl')")
+             
+             stop("Cannot read file, stopping", call.=FALSE)
+             })
+  
+  df
+  
 }
 
 s3_path_to_df.xls <- function(path, ...){

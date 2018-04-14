@@ -4,7 +4,6 @@
 #' @param bucket_filter return only buckets that match this character vector of bucket names 
 #'
 #' @return data frame (tbl_df) with path of all files available to you in S3.
-#' @export
 #' @examples accessible_files_df()
 #'
 accessible_files_df <- function(bucket_filter=NULL) {
@@ -52,8 +51,6 @@ accessible_files_df <- function(bucket_filter=NULL) {
 #' @param current_path a string with the path of the folder to query
 #'
 #' @return list of directories
-#' @export
-#' @importFrom magrittr %>%
 #'
 #' @examples s3_dir('directory')
 s3_dir <- function (current_path=NULL) {
@@ -65,7 +62,6 @@ s3_dir <- function (current_path=NULL) {
   if (strtail(current_path,1) != "/") {
     current_path <- paste0(current_path, "/")
   }
-  
   
   message(current_path)
   
@@ -83,23 +79,4 @@ s3_dir <- function (current_path=NULL) {
   
   file_list$relative_path
   
-}
-
-
-#' Search all available files, return a vector of paths
-#'
-#' @return a vector of matching paths
-#' @export
-#' @examples find_s3_paths('temp\\d')
-#'
-find_s3_paths <- function(search_pattern){
-
-  all_files <- accessible_files_df()
-  
-  f1 <- grepl(search_pattern, all_files$path)
-
-  all_files <- all_files[f1,]
-  
-  all_files$path
-
 }
