@@ -47,6 +47,8 @@ s3_path_to_df.csv <- function(path, ..., head) {
     df <- read.csv(text = rawToChar(ob), stringsAsFactors = FALSE)
   }
   
+  df
+  
 }
 
 s3_path_to_df.tsv <- function(path, ...){
