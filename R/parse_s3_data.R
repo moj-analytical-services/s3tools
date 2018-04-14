@@ -1,11 +1,3 @@
-separate_bucket_path <- function(path) {
-  parts <- strsplit(path, "/")[[1]]
-  bucket <- parts[1]
-  otherparts <- parts[2:length(parts)]
-  object <-  paste(otherparts, collapse="/")
-  list("object" = object, "bucket" = bucket )
-}
-
 #' Preview the first 5 rows of a file from S3, using the full path to the file including the bucketname
 #'
 #' @param path a string -  the full path to the file including the bucketname
@@ -32,7 +24,6 @@ s3_path_to_preview_df <- function(path, ...) {
 #'
 #' @return a tibble (dataframe)
 #' @export
-#'
 #'
 #' @examples df <- s3_read_path_to_df("alpha-moj-analytics-scratch/folder/file.csv")
 #' @examples df <- s3_read_path_to_df("alpha-moj-analytics-scratch/folder/file.tsv")

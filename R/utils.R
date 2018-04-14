@@ -17,3 +17,16 @@ s3_file_exists <- function(bucket, file_path) {
   objs <- aws.s3::get_bucket(bucket, prefix = file_path)
   return(length(objs)>0)
 }
+
+separate_bucket_path <- function(path) {
+  
+  if (substring(path, 1, 1) == "/") {
+    path <- substring(path, 2)
+  }
+  
+  parts <- strsplit(path, "/")[[1]]
+  bucket <- parts[1]
+  otherparts <- parts[2:length(parts)]
+  object <-  paste(otherparts, collapse="/")
+  list("object" = object, "bucket" = bucket )
+}

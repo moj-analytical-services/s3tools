@@ -4,14 +4,14 @@
 \alias{read_using}
 \title{Read from S3 using a particular function}
 \usage{
-read_using(FUN, ..., path)
+read_using(FUN, path, ...)
 }
 \arguments{
 \item{FUN}{a function to parse the data into}
 
-\item{...}{arguments for said function}
-
 \item{path}{path to the s3 file bucket/folder/file.txt}
+
+\item{...}{arguments for said function}
 }
 \value{
 whatever the function returns
