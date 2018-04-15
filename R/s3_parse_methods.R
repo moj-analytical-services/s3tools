@@ -68,7 +68,7 @@ s3_path_to_df.xlsx <- function(path, ..., head){
           readxl::read_excel(path=file_location, ...)
           },
           error= function(cond){
-             message("Attempted to read file using the readxl package, but it is not installed.  ")
+             message("Attempted to read file using the readxl package, but it is not installed or the file could not be parsed")
              message("You can install this package by running install.packages('readxl')")
              
              stop("Cannot read file, stopping", call.=FALSE)
@@ -80,6 +80,73 @@ s3_path_to_df.xlsx <- function(path, ..., head){
 
 s3_path_to_df.xls <- function(path, ...){
   s3_path_to_df.xlsx(path, ...)
+}
+
+s3_path_to_df.sas7bdat <- function(path, ..., head){
+  
+  if(is.logical(head) && head){
+    message('Preview not supported for sas files')
+  }
+  file_location <- s3_download_temp_file(path)
+  message(paste0('Temp file saved to: ', file_location))
+  
+  df <- tryCatch({
+    haven::read_sas(file_location, ...)
+  },
+  error= function(cond){
+    message("Attempted to read file using the haven package, but it is not installed or the file could not be parsed  ")
+    message("You can install this package by running install.packages('haven')")
+    
+    stop("Cannot read file, stopping", call.=FALSE)
+  })
+  
+  df
+  
+}
+
+s3_path_to_df.sav <- function(path, ..., head){
+  
+  if(is.logical(head) && head){
+    message('Preview not supported for spss files')
+  }
+  file_location <- s3_download_temp_file(path)
+  message(paste0('Temp file saved to: ', file_location))
+  
+  df <- tryCatch({
+    haven::read_spss(file_location, ...)
+  },
+  error= function(cond){
+    message("Attempted to read file using the haven package, but it is not installed or the file could not be parsed  ")
+    message("You can install this package by running install.packages('haven')")
+    
+    stop("Cannot read file, stopping")
+  })
+  
+  df
+  
+}
+
+
+s3_path_to_df.dta <- function(path, ..., head){
+  
+  if(is.logical(head) && head){
+    message('Preview not supported for stata .dat files')
+  }
+  file_location <- s3_download_temp_file(path)
+  message(paste0('Temp file saved to: ', file_location))
+  
+  df <- tryCatch({
+    haven::read_stata(file_location, ...)
+  },
+  error= function(cond){
+    message("Attempted to read file using the haven package, but it is not installed or the file could not be parsed")
+    message("You can install this package by running install.packages('haven')")
+    
+    stop("Cannot read file, stopping", call.=FALSE)
+  })
+  
+  df
+  
 }
 
 

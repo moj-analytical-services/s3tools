@@ -1,5 +1,5 @@
 ---
-title: "Introduction"
+title: "How to use s3tools"
 author: "Robin Linacre"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -9,21 +9,11 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-The s3tools package contains a number of helper functions for the analytical platform which allows you to find the files you have access to, read them into R, and write files back out to Amazon S3.
+The `s3tools` package allows you to read and write files from the Analytical Platform's data store in Amazon S3. It allows you to find the files you have access to, read them into R, and write files back out to Amazon S3.
 
 ```{r setup, include=FALSE}
 library(s3tools)
 knitr::opts_chunk$set(echo = TRUE)
-```
-
-In what follows I assume you've installed and read in the library:
-```{r, echo=TRUE, eval=FALSE}
-# You only need to run the following two lines once, if you haven't already installed these packages
-install.packages("devtools")
-devtools::install_github("moj-analytical-services/s3tools")
-
-# Once installed, this makes the library available for use
-library(s3tools)
 ```
 
 
@@ -31,177 +21,106 @@ library(s3tools)
 
 You can find which buckets you have access to using the following code.  It will return a character vector of buckets.
 
-```{r}
-accessible_buckets()
+```{r eval=FALSE}
+s3tools::accessible_buckets()
 ```
 
 ## What files do I have access to?
 
-You can search for files that match a string (ora regex pattern) as follows:
+```{r eval=FALSE}
+## List all the files in the alpha-everyone bucket
+s3tools::list_files_in_buckets('alpha-everyone')
 
-```{r}
-find_s3_paths("random")
+## You can list files in more than one bucket:
+s3tools::list_files_in_buckets(c('alpha-everyone', 'alpha-dash'))
+
+## You can filter by prefix, to return only files in a folder
+s3tools::list_files_in_buckets('alpha-everyone', prefix='s3tools_tests')
+
+## The 'prefix' argument is used to filter results to any path that begins with the prefix. 
+s3tools::list_files_in_buckets('alpha-everyone', prefix='s3tools_tests', path_only = TRUE)
+
+## For more complex filters, you can always filter down the dataframe using standard R code:
+library(dplyr)
+
+## All files containing the string 'iris'
+s3tools::list_files_in_buckets('alpha-everyone') %>% 
+  dplyr::filter(grepl("iris",path)) # Use a regular expression
+
+## All excel files containing 'iris;
+s3tools::list_files_in_buckets('alpha-everyone') %>% 
+  dplyr::filter(grepl("iris*.xls",path)) 
+
 ```
 
-The following function call returns a dataframe containing a list of all the files you have access to.  Printed below is only the first two columns and five rows of the returned dataframe.
-```{r, eval=FALSE}
-accessible_files_df()
-```
-```{r, echo=FALSE}
-df <- structure(list(path = c("alpha-moj-analytics-scratch/1g_random.csv", 
-"alpha-moj-analytics-scratch/a/b/c/robins_temp.csv", "alpha-moj-analytics-scratch/my_folder/10mb_random.csv", 
-"alpha-moj-analytics-scratch/police-100.csv", "alpha-moj-analytics-scratch/robins_temp.csv", 
-"alpha-moj-analytics-scratch/test_folder/"), size_readable = c("  1.3 GiB", 
-" 16.0 B  ", " 19.8 MiB", " 21.7 KiB", " 16.0 B  ", "  0.0 B  "
-), key = c("1g_random.csv", "a/b/c/robins_temp.csv", "my_folder/10mb_random.csv", 
-"police-100.csv", "robins_temp.csv", "test_folder/"), lastmodified = c("2017-05-07T12:43:28.000Z", 
-"2017-04-04T16:08:58.000Z", "2017-05-07T13:45:57.000Z", "2017-03-10T08:47:05.000Z", 
-"2017-04-04T16:08:40.000Z", "2017-04-04T15:56:49.000Z"), etag = c("\"5782c03913146e623bc474e7a972aaef\"", 
-"\"90f19f2dbf0b5435325fef46457b61a9\"", "\"30da853f629e11950537c978845028b4\"", 
-"\"64dc2cd0acf08b43058a58057b45b988\"", "\"90f19f2dbf0b5435325fef46457b61a9\"", 
-"\"d41d8cd98f00b204e9800998ecf8427e\""), size = c(1383286239, 
-16, 20740660, 22186, 16, 0), storageclass = c("STANDARD", "STANDARD", 
-"STANDARD", "STANDARD", "STANDARD", "STANDARD"), bucket = c("alpha-moj-analytics-scratch", 
-"alpha-moj-analytics-scratch", "alpha-moj-analytics-scratch", 
-"alpha-moj-analytics-scratch", "alpha-moj-analytics-scratch", 
-"alpha-moj-analytics-scratch")), .Names = c("path", "size_readable", 
-"key", "lastmodified", "etag", "size", "storageclass", "bucket"
-), row.names = c(NA, -6L), class = c("tbl_df", "tbl", "data.frame"
-))
-knitr::kable(df[, c("path", "size_readable")])
-```
 
-## What's in the files I have access to?
 
-If you know the full path that you'd like to access, you can read the file as follows:
+## Reading files
+
+Once you know the full path that you'd like to access, you can read the file as follows.  
+
+### `csv` files
+
+For `csv` files, this will use the default `read.csv` csv reader:
 
 ```{r, include=TRUE, eval=FALSE}
-df <-s3tools::s3_path_to_full_df("alpha-moj-analytics-scratch/my_folder/10mb_random.csv")
+df <-s3tools::s3_path_to_full_df("alpha-everyone/s3tools_tests/folder1/iris_folder1_1.csv")
 print(head(df))
 ```
 
-
-If the file is very large, and you want to preview it before having to transfer it, you can do this:
+For large csv files, if you want to preview the first few rows without downloading the whole file, you can do this:
 
 ```{r, include=TRUE, eval=FALSE}
 df <- s3tools::s3_path_to_preview_df("alpha-moj-analytics-scratch/my_folder/10mb_random.csv")
 print(df)
 ```
 
-You can get a preview of all files matching a search string.  This will only download the first few kilobytes of each dataframe, so will work quickly even if the underlying files are large.
-```{r, eval=FALSE}
-search_and_preview_dfs("random")
-```
-```{r echo=FALSE}
-output <- structure(list(`alpha-moj-analytics-scratch/1g_random.csv` = structure(list(
-    X = 1:6, cat_0 = structure(c(20L, 17L, 40L, 18L, 15L, 10L
-    ), .Label = c("a", "B", "c", "C", "d", "D", "E", "f", "F", 
-    "G", "h", "H", "i", "I", "J", "K", "L", "m", "M", "n", "N", 
-    "o", "O", "p", "P", "q", "Q", "r", "R", "s", "S", "t", "T", 
-    "u", "U", "V", "w", "W", "x", "X", "y", "z", "Z"), class = "factor"), 
-    cat_1 = structure(c(37L, 4L, 14L, 5L, 1L, 34L), .Label = c("a", 
-    "B", "c", "C", "d", "D", "E", "F", "G", "h", "H", "i", "I", 
-    "j", "J", "k", "l", "L", "m", "M", "n", "N", "o", "O", "p", 
-    "P", "q", "Q", "r", "R", "S", "t", "T", "u", "U", "v", "V", 
-    "W", "X", "y", "Y", "z"), class = "factor"), dis_0 = c(98L, 
-    85L, 21L, 29L, 20L, 49L), dis_1 = c(85L, 11L, 72L, 95L, 87L, 
-    15L), con_0 = c(0.459547384874895, 0.546252108877525, 0.775631004013121, 
-    0.394553919089958, 0.104646710678935, 0.988255339674652), 
-    cat_2 = structure(c(25L, 32L, 33L, 6L, 7L, 30L), .Label = c("a", 
-    "A", "b", "B", "c", "C", "d", "D", "E", "f", "F", "g", "h", 
-    "H", "i", "I", "j", "J", "l", "L", "M", "n", "N", "o", "O", 
-    "p", "P", "q", "r", "R", "s", "S", "t", "T", "v", "V", "w", 
-    "W", "x", "X", "y", "Y", "Z"), class = "factor"), con_1 = c(0.232149972347543, 
-    0.676291991490871, 0.390401212032884, 0.969972511287779, 
-    0.793501558015123, 0.114621909800917), dis_2 = c(33L, 23L, 
-    14L, 36L, 95L, 24L), cat_3 = structure(c(9L, 23L, 6L, 40L, 
-    17L, 36L), .Label = c("a", "A", "b", "c", "C", "d", "D", 
-    "e", "E", "F", "g", "G", "i", "I", "j", "J", "k", "K", "l", 
-    "L", "M", "n", "o", "O", "P", "q", "Q", "r", "R", "s", "S", 
-    "t", "T", "u", "U", "v", "V", "w", "W", "y", "z", "Z"), class = "factor"), 
-    cat_4 = structure(c(1L, 8L, 22L, 20L, 13L, 40L), .Label = c("a", 
-    "A", "b", "B", "c", "C", "d", "D", "e", "f", "F", "g", "G", 
-    "h", "H", "i", "I", "j", "J", "l", "L", "m", "M", "n", "N", 
-    "o", "O", "p", "P", "q", "Q", "r", "R", "s", "S", "t", "T", 
-    "u", "U", "V", "w", "W", "X", "y", "Y", "z", "Z"), class = "factor"), 
-    dis_3 = c(90L, 96L, 70L, 15L, 78L, 38L), dis_4 = c(43L, 53L, 
-    63L, 28L, 86L, 21L), cat_5 = structure(c(28L, 5L, 23L, 6L, 
-    26L, 32L), .Label = c("a", "A", "b", "B", "c", "C", "d", 
-    "e", "E", "f", "F", "G", "h", "i", "I", "j", "J", "k", "K", 
-    "l", "L", "m", "M", "n", "N", "O", "p", "P", "q", "Q", "r", 
-    "t", "T", "u", "U", "V", "w", "x", "X", "y", "Y", "z"), class = "factor"), 
-    cat_6 = structure(c(5L, 9L, 38L, 22L, 28L, 18L), .Label = c("a", 
-    "A", "b", "C", "e", "f", "F", "g", "G", "h", "i", "I", "j", 
-    "J", "K", "L", "m", "M", "n", "N", "o", "O", "p", "P", "q", 
-    "Q", "r", "R", "s", "S", "t", "T", "u", "U", "v", "w", "W", 
-    "x", "X", "y", "Y", "z", "Z"), class = "factor"), dis_5 = c(27L, 
-    50L, 17L, 91L, 89L, 18L), con_2 = c(0.362762712407857, 0.881946622161195, 
-    0.214197929715738, 0.584599293768406, 0.99718994461, 0.179380150744691
-    ), cat_7 = structure(c(42L, 19L, 10L, 14L, 6L, 16L), .Label = c("a", 
-    "A", "b", "B", "c", "C", "d", "D", "E", "f", "G", "h", "H", 
-    "i", "j", "J", "k", "K", "l", "L", "m", "M", "O", "P", "q", 
-    "Q", "r", "R", "s", "S", "t", "T", "u", "U", "v", "V", "w", 
-    "W", "x", "X", "y", "z", "Z"), class = "factor"), con_3 = c(0.861788926180452, 
-    0.677296633832157, 0.113937030779198, 0.234226085245609, 
-    0.87426465889439, 0.361892535816878), dis_6 = c(98L, 58L, 
-    13L, 88L, 84L, 76L), cat_8 = structure(c(37L, 12L, 15L, 45L, 
-    34L, 41L), .Label = c("", "a", "b", "B", "c", "C", "d", "D", 
-    "e", "E", "f", "F", "g", "h", "H", "I", "j", "J", "k", "K", 
-    "l", "L", "m", "M", "n", "N", "O", "p", "P", "q", "Q", "r", 
-    "R", "s", "S", "t", "T", "U", "v", "V", "w", "W", "X", "y", 
-    "Y", "z", "Z"), class = "factor")), .Names = c("X", "cat_0", 
-"cat_1", "dis_0", "dis_1", "con_0", "cat_2", "con_1", "dis_2", 
-"cat_3", "cat_4", "dis_3", "dis_4", "cat_5", "cat_6", "dis_5", 
-"con_2", "cat_7", "con_3", "dis_6", "cat_8"), row.names = c(NA, 
-6L), class = c("tbl_df", "tbl", "data.frame")), `alpha-moj-analytics-scratch/my_folder/10mb_random.csv` = structure(list(
-    X = 1:6, dis_0 = c(51L, 53L, 34L, 51L, 60L, 7L), dis_1 = c(37L, 
-    26L, 61L, 73L, 41L, 81L), dis_2 = c(20L, 63L, 1L, 29L, 20L, 
-    27L), con_0 = c(0.768040769500658, 0.963850252330303, 0.965094320010394, 
-    0.646539378678426, 0.088068486424163, 0.766975291073322), 
-    cat_0 = structure(c(32L, 4L, 29L, 10L, 7L, 20L), .Label = c("a", 
-    "A", "b", "B", "c", "C", "E", "f", "F", "h", "H", "i", "I", 
-    "j", "J", "K", "l", "m", "M", "N", "o", "O", "p", "P", "r", 
-    "R", "s", "S", "T", "u", "U", "v", "V", "w", "X", "y", "Y", 
-    "z", "Z"), class = "factor"), cat_1 = structure(c(2L, 13L, 
-    1L, 15L, 28L, 32L), .Label = c("A", "c", "d", "D", "e", "E", 
-    "F", "i", "k", "l", "L", "m", "M", "n", "N", "o", "O", "p", 
-    "P", "q", "Q", "r", "R", "t", "u", "U", "V", "w", "W", "x", 
-    "X", "y", "Y", "z", "Z"), class = "factor"), dis_3 = c(47L, 
-    74L, 83L, 39L, 44L, 76L), con_1 = c(0.837674492038786, 0.957803848665208, 
-    0.323615500936285, 0.883469334570691, 0.678545640315861, 
-    0.091131204739213), con_2 = c(0.626011276850477, 0.964001426706091, 
-    0.655233982717618, 0.368007752811536, 0.328476837370545, 
-    0.972655468154699), con_3 = c(0.16277004708536, 0.709614617517218, 
-    0.367361673386768, 0.203314994461834, 0.5229888393078, 0.264434679877013
-    ), con_4 = c(0.285662400303409, 0.790500834817067, 0.327651519794017, 
-    0.802909176563844, 0.322805975098163, 0.325827202992514), 
-    cat_2 = structure(c(15L, 24L, 33L, 11L, 3L, 15L), .Label = c("b", 
-    "c", "C", "D", "e", "E", "f", "F", "g", "G", "H", "i", "I", 
-    "j", "J", "k", "K", "l", "M", "N", "O", "p", "P", "Q", "R", 
-    "t", "T", "u", "U", "V", "y", "Y", "Z"), class = "factor"), 
-    cat_3 = structure(c(18L, 16L, 25L, 1L, 24L, 11L), .Label = c("a", 
-    "A", "b", "B", "d", "e", "f", "g", "h", "H", "I", "j", "J", 
-    "k", "K", "L", "m", "M", "N", "o", "p", "P", "q", "s", "t", 
-    "u", "U", "v", "V", "w", "W", "x", "y", "z", "Z"), class = "factor"), 
-    con_5 = c(0.485727712744847, 0.420300406171009, 0.344306854298338, 
-    0.441923798760399, 0.808826495427638, 0.627455227077007), 
-    dis_4 = c(20L, 73L, 19L, 14L, 27L, 84L), con_6 = c(0.410067381570116, 
-    0.284631170565262, 0.0860434919595718, 0.103405332192779, 
-    0.920276337303221, 0.807282368652523), cat_4 = structure(c(30L, 
-    17L, 16L, 25L, 27L, 20L), .Label = c("A", "B", "C", "d", 
-    "D", "e", "E", "F", "g", "G", "H", "i", "J", "k", "K", "l", 
-    "L", "m", "M", "n", "N", "q", "Q", "r", "R", "t", "v", "V", 
-    "w", "W", "X", "y", "z", "Z"), class = "factor"), con_7 = c(0.90418978058733, 
-    0.456440823385492, 0.0538796158507466, 0.258736338466406, 
-    0.471502530388534, 0.232990759192035), dis_5 = c(48L, 84L, 
-    74L, 51L, 17L, 30L), con_8 = c(0.525059757521376, 0.903073888737708, 
-    0.570442583179101, 0.979278079699725, 0.497076780535281, 
-    0.500315500423312)), .Names = c("X", "dis_0", "dis_1", "dis_2", 
-"con_0", "cat_0", "cat_1", "dis_3", "con_1", "con_2", "con_3", 
-"con_4", "cat_2", "cat_3", "con_5", "dis_4", "con_6", "cat_4", 
-"con_7", "dis_5", "con_8"), row.names = c(NA, 6L), class = c("tbl_df", 
-"tbl", "data.frame"))), .Names = c("alpha-moj-analytics-scratch/1g_random.csv", 
-"alpha-moj-analytics-scratch/my_folder/10mb_random.csv"))
+### Other file types
 
-output
+For xls, xlsx, sav (spss), dta (stata), and sas7bdat (sas) file types, s3tools will attempt to read these files if the relevant reader package is installed:
+
+```{r, include=TRUE, eval=FALSE}
+df <-s3tools::s3_path_to_full_df("alpha-everyone/s3tools_tests/iris_base.xlsx")  # Uses readxl if installed, otherwise errors
+
+df <-s3tools::s3_path_to_full_df("alpha-everyone/s3tools_tests/iris_base.sav")  # Uses haven if installed, otherwise errors
+df <-s3tools::s3_path_to_full_df("alpha-everyone/s3tools_tests/iris_base.dta")  # Uses haven if installed, otherwise errors
+df <-s3tools::s3_path_to_full_df("alpha-everyone/s3tools_tests/iris_base.sas7bdat")  # Uses haven if installed, otherwise errors
+
+```
+
+If you have a different file type, or you're having a problem with the automatic readers, you can specify a file read function:
+
+```{r, include=TRUE, eval=FALSE}
+s3tools::read_using(FUN=readr::read_csv, "alpha-everyone/s3tools_tests/iris_base.csv")
+```
+
+If you're interested in adding support for additional file types, feel free to add some code to [this file](https://github.com/moj-analytical-services/s3tools/blob/master/R/s3_parse_methods.R) and raise a pull request against the [s3tools repo](https://github.com/moj-analytical-services/s3tools/).
+
+## Downloading files
+
+```{r, include=TRUE, eval=FALSE}
+df <- s3tools::download_file_from_s3("alpha-everyone/s3tools_tests/iris_base.csv", "my_downloaded_file.csv")
+
+# By default, if the file already exists you will receive an error.  To override:
+df <- s3tools::download_file_from_s3("alpha-everyone/s3tools_tests/iris_base.csv", "my_downloaded_file.csv", overwrite =TRUE)
+```
+
+## Writing data to s3
+
+### Writing files to s3
+
+```{r, include=TRUE, eval=FALSE}
+s3tools::write_file_to_s3("my_downloaded_file.csv", "alpha-everyone/delete/my_downloaded_file.csv")
+
+# By default, if the file already exists you will receive an error.  To override:
+s3tools::write_file_to_s3("my_downloaded_file.csv", "alpha-everyone/delete/my_downloaded_file.csv", overwrite =TRUE)
+```
+
+### Writing a dataframe to s3 in `csv` format
+
+```{r, include=TRUE, eval=FALSE}
+s3tools::write_df_to_csv_in_s3(iris, "alpha-everyone/delete/iris.csv")
+
+# By default, if the file already exists you will receive an error.  To override:
+s3tools::write_file_to_s3(iris, "alpha-everyone/delete/iris.csv", overwrite =TRUE)
 ```
