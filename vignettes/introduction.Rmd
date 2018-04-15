@@ -71,7 +71,7 @@ print(head(df))
 For large csv files, if you want to preview the first few rows without downloading the whole file, you can do this:
 
 ```{r, include=TRUE, eval=FALSE}
-df <- s3tools::s3_path_to_preview_df("alpha-moj-analytics-scratch/my_folder/10mb_random.csv")
+df <- s3tools::s3_path_to_preview_df("alpha-everyone/s3tools_tests/folder1/iris_folder1_1.csv")
 print(df)
 ```
 
