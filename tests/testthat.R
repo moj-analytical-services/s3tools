@@ -41,4 +41,3 @@ for (file in files) {
 
 aws.s3::put_folder(folder="s3tools_tests/empty_folder", bucket="alpha-everyone")
 
-

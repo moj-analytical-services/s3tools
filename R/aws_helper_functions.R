@@ -36,6 +36,7 @@ list_files_in_buckets <- function(bucket_filter=NULL, prefix=NULL, path_only=FAL
   
   if (nrow(af)==0) {
     return(NULL)
+
   }
   
   cols_to_keep <- c("Key", "LastModified","ETag","Size","StorageClass","Bucket")
