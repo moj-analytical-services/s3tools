@@ -4,7 +4,7 @@
 \alias{read_using}
 \title{Read from S3 using a particular function}
 \usage{
-read_using(FUN, ..., path)
+read_using(FUN, s3_path, ...)
 }
 \arguments{
 \item{FUN}{a function to parse the data into}
@@ -20,5 +20,5 @@ whatever the function returns
 Read from S3 using a particular function
 }
 \examples{
-s3tools:::read_using(FUN=readxl::read_excel, path="alpha-test-team/mpg.xlsx")
+s3tools:::read_using(FUN=readxl::read_excel, s3_path="alpha-test-team/mpg.xlsx")
 }

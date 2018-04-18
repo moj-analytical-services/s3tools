@@ -1,15 +1,4 @@
-The s3tools package contains a number of helper functions for the analytical platform which allows you to find the files you have access to, read them into R, and write files back out to Amazon S3.
-
-In what follows I assume you've installed and read in the library:
-
-``` r
-# You only need to run the following two lines once, if you haven't already installed these packages
-install.packages("devtools")
-devtools::install_github("moj-analytical-services/s3tools")
-
-# Once installed, this makes the library available for use
-library(s3tools)
-```
+The `s3tools` package allows you to read and write files from the Analytical Platform's data store in Amazon S3. It allows you to find the files you have access to, read them into R, and write files back out to Amazon S3.
 
 Which buckets do I have access to?
 ----------------------------------
@@ -17,111 +6,105 @@ Which buckets do I have access to?
 You can find which buckets you have access to using the following code. It will return a character vector of buckets.
 
 ``` r
-accessible_buckets()
+s3tools::accessible_buckets()
 ```
-
-    ## [1] "alpha-moj-analytics-scratch" "alpha-moj-analytics-source"
 
 What files do I have access to?
 -------------------------------
 
-You can search for files that match a string (ora regex pattern) as follows:
-
 ``` r
-find_s3_paths("random")
+## List all the files in the alpha-everyone bucket
+s3tools::list_files_in_buckets('alpha-everyone')
+
+## You can list files in more than one bucket:
+s3tools::list_files_in_buckets(c('alpha-everyone', 'alpha-dash'))
+
+## You can filter by prefix, to return only files in a folder
+s3tools::list_files_in_buckets('alpha-everyone', prefix='s3tools_tests')
+
+## The 'prefix' argument is used to filter results to any path that begins with the prefix. 
+s3tools::list_files_in_buckets('alpha-everyone', prefix='s3tools_tests', path_only = TRUE)
+
+## For more complex filters, you can always filter down the dataframe using standard R code:
+library(dplyr)
+
+## All files containing the string 'iris'
+s3tools::list_files_in_buckets('alpha-everyone') %>% 
+  dplyr::filter(grepl("iris",path)) # Use a regular expression
+
+## All excel files containing 'iris;
+s3tools::list_files_in_buckets('alpha-everyone') %>% 
+  dplyr::filter(grepl("iris*.xls",path)) 
 ```
 
-    ## [1] "alpha-moj-analytics-scratch/1g_random.csv"            
-    ## [2] "alpha-moj-analytics-scratch/my_folder/10mb_random.csv"
+Reading files
+-------------
 
-The following function call returns a dataframe containing a list of all the files you have access to. Printed below is only the first two columns and five rows of the returned dataframe.
+Once you know the full path that you'd like to access, you can read the file as follows.
 
-``` r
-accessible_files_df()
-```
+### `csv` files
 
-| path                                                    | size\_readable |
-|:--------------------------------------------------------|:---------------|
-| alpha-moj-analytics-scratch/1g\_random.csv              | 1.3 GiB        |
-| alpha-moj-analytics-scratch/a/b/c/robins\_temp.csv      | 16.0 B         |
-| alpha-moj-analytics-scratch/my\_folder/10mb\_random.csv | 19.8 MiB       |
-| alpha-moj-analytics-scratch/police-100.csv              | 21.7 KiB       |
-| alpha-moj-analytics-scratch/robins\_temp.csv            | 16.0 B         |
-| alpha-moj-analytics-scratch/test\_folder/               | 0.0 B          |
-
-What's in the files I have access to?
--------------------------------------
-
-If you know the full path that you'd like to access, you can read the file as follows:
+For `csv` files, this will use the default `read.csv` csv reader:
 
 ``` r
-df <-s3tools::s3_path_to_full_df("alpha-moj-analytics-scratch/my_folder/10mb_random.csv")
+df <-s3tools::s3_path_to_full_df("alpha-everyone/s3tools_tests/folder1/iris_folder1_1.csv")
 print(head(df))
 ```
 
-    ## # A tibble: 6 × 21
-    ##       X dis_0 dis_1 dis_2      con_0  cat_0  cat_1 dis_3     con_1
-    ##   <int> <int> <int> <int>      <dbl> <fctr> <fctr> <int>     <dbl>
-    ## 1     1    51    37    20 0.76804077      v      c    47 0.8376745
-    ## 2     2    53    26    63 0.96385025      B      M    74 0.9578038
-    ## 3     3    34    61     1 0.96509432      T      A    83 0.3236155
-    ## 4     4    51    73    29 0.64653938      h      N    39 0.8834693
-    ## 5     5    60    41    20 0.08806849      E      w    44 0.6785456
-    ## 6     6     7    81    27 0.76697529      N      y    76 0.0911312
-    ## # ... with 12 more variables: con_2 <dbl>, con_3 <dbl>, con_4 <dbl>,
-    ## #   cat_2 <fctr>, cat_3 <fctr>, con_5 <dbl>, dis_4 <int>, con_6 <dbl>,
-    ## #   cat_4 <fctr>, con_7 <dbl>, dis_5 <int>, con_8 <dbl>
-
-If the file is very large, and you want to preview it before having to transfer it, you can do this:
+For large csv files, if you want to preview the first few rows without downloading the whole file, you can do this:
 
 ``` r
 df <- s3tools::s3_path_to_preview_df("alpha-moj-analytics-scratch/my_folder/10mb_random.csv")
 print(df)
 ```
 
-    ## # A tibble: 6 × 21
-    ##       X dis_0 dis_1 dis_2      con_0  cat_0  cat_1 dis_3     con_1
-    ## * <int> <int> <int> <int>      <dbl> <fctr> <fctr> <int>     <dbl>
-    ## 1     1    51    37    20 0.76804077      v      c    47 0.8376745
-    ## 2     2    53    26    63 0.96385025      B      M    74 0.9578038
-    ## 3     3    34    61     1 0.96509432      T      A    83 0.3236155
-    ## 4     4    51    73    29 0.64653938      h      N    39 0.8834693
-    ## 5     5    60    41    20 0.08806849      E      w    44 0.6785456
-    ## 6     6     7    81    27 0.76697529      N      y    76 0.0911312
-    ## # ... with 12 more variables: con_2 <dbl>, con_3 <dbl>, con_4 <dbl>,
-    ## #   cat_2 <fctr>, cat_3 <fctr>, con_5 <dbl>, dis_4 <int>, con_6 <dbl>,
-    ## #   cat_4 <fctr>, con_7 <dbl>, dis_5 <int>, con_8 <dbl>
+### Other file types
 
-You can get a preview of all files matching a search string. This will only download the first few kilobytes of each dataframe, so will work quickly even if the underlying files are large.
+For xls, xlsx, sav (spss), dta (stata), and sas7bdat (sas) file types, s3tools will attempt to read these files if the relevant reader package is installed:
 
 ``` r
-search_and_preview_dfs("random")
+df <-s3tools::s3_path_to_full_df("alpha-everyone/s3tools_tests/iris_base.xlsx")  # Uses readxl if installed, otherwise errors
+
+df <-s3tools::s3_path_to_full_df("alpha-everyone/s3tools_tests/iris_base.sav")  # Uses haven if installed, otherwise errors
+df <-s3tools::s3_path_to_full_df("alpha-everyone/s3tools_tests/iris_base.dta")  # Uses haven if installed, otherwise errors
+df <-s3tools::s3_path_to_full_df("alpha-everyone/s3tools_tests/iris_base.sas7bdat")  # Uses haven if installed, otherwise errors
 ```
 
-    ## $`alpha-moj-analytics-scratch/1g_random.csv`
-    ## # A tibble: 6 × 21
-    ##       X  cat_0  cat_1 dis_0 dis_1     con_0  cat_2     con_1 dis_2  cat_3
-    ## * <int> <fctr> <fctr> <int> <int>     <dbl> <fctr>     <dbl> <int> <fctr>
-    ## 1     1      n      V    98    85 0.4595474      O 0.2321500    33      E
-    ## 2     2      L      C    85    11 0.5462521      S 0.6762920    23      o
-    ## 3     3      X      j    21    72 0.7756310      t 0.3904012    14      d
-    ## 4     4      m      d    29    95 0.3945539      C 0.9699725    36      y
-    ## 5     5      J      a    20    87 0.1046467      d 0.7935016    95      k
-    ## 6     6      G      u    49    15 0.9882553      R 0.1146219    24      v
-    ## # ... with 11 more variables: cat_4 <fctr>, dis_3 <int>, dis_4 <int>,
-    ## #   cat_5 <fctr>, cat_6 <fctr>, dis_5 <int>, con_2 <dbl>, cat_7 <fctr>,
-    ## #   con_3 <dbl>, dis_6 <int>, cat_8 <fctr>
-    ## 
-    ## $`alpha-moj-analytics-scratch/my_folder/10mb_random.csv`
-    ## # A tibble: 6 × 21
-    ##       X dis_0 dis_1 dis_2      con_0  cat_0  cat_1 dis_3     con_1
-    ## * <int> <int> <int> <int>      <dbl> <fctr> <fctr> <int>     <dbl>
-    ## 1     1    51    37    20 0.76804077      v      c    47 0.8376745
-    ## 2     2    53    26    63 0.96385025      B      M    74 0.9578038
-    ## 3     3    34    61     1 0.96509432      T      A    83 0.3236155
-    ## 4     4    51    73    29 0.64653938      h      N    39 0.8834693
-    ## 5     5    60    41    20 0.08806849      E      w    44 0.6785456
-    ## 6     6     7    81    27 0.76697529      N      y    76 0.0911312
-    ## # ... with 12 more variables: con_2 <dbl>, con_3 <dbl>, con_4 <dbl>,
-    ## #   cat_2 <fctr>, cat_3 <fctr>, con_5 <dbl>, dis_4 <int>, con_6 <dbl>,
-    ## #   cat_4 <fctr>, con_7 <dbl>, dis_5 <int>, con_8 <dbl>
+If you have a different file type, or you're having a problem with the automatic readers, you can specify a file read function:
+
+``` r
+s3tools::read_using(FUN=readr::read_csv, "alpha-everyone/s3tools_tests/iris_base.csv")
+```
+
+If you're interested in adding support for additional file types, feel free to add some code to [this file](https://github.com/moj-analytical-services/s3tools/blob/master/R/s3_parse_methods.R) and raise a pull request against the [s3tools repo](https://github.com/moj-analytical-services/s3tools/).
+
+Downloading files
+-----------------
+
+``` r
+df <- s3tools::download_file_from_s3("alpha-everyone/s3tools_tests/iris_base.csv", "my_downloaded_file.csv")
+
+# By default, if the file already exists you will receive an error.  To override:
+df <- s3tools::download_file_from_s3("alpha-everyone/s3tools_tests/iris_base.csv", "my_downloaded_file.csv", overwrite =TRUE)
+```
+
+Writing data to s3
+------------------
+
+### Writing files to s3
+
+``` r
+s3tools::write_file_to_s3("my_downloaded_file.csv", "alpha-everyone/delete/my_downloaded_file.csv")
+
+# By default, if the file already exists you will receive an error.  To override:
+s3tools::write_file_to_s3("my_downloaded_file.csv", "alpha-everyone/delete/my_downloaded_file.csv", overwrite =TRUE)
+```
+
+### Writing a dataframe to s3 in `csv` format
+
+``` r
+s3tools::write_df_to_csv_in_s3(iris, "alpha-everyone/delete/iris.csv")
+
+# By default, if the file already exists you will receive an error.  To override:
+s3tools::write_file_to_s3(iris, "alpha-everyone/delete/iris.csv", overwrite =TRUE)
+```

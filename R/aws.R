@@ -1,3 +1,9 @@
+#' Get a vector of the buckets (base folders) which the user has permission to read from 
+#'
+#' @return character
+#' @export
+#'
+#' @examples accessible_buckets()
 accessible_buckets <- function() {
   role_name <- aws.ec2metadata::metadata$iam_role_names()
   policy <- get_role_policy("s3-access", role_name)

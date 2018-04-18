@@ -1,5 +1,6 @@
 Package: s3tools
 Title: Tools to help explore s3
+
 Version: 0.0.3
 Authors@R: c(person("Will", "Bowditch", email = "william.bowditch@digital.justice.gov.uk", role = c("aut")),person("Robin", "Linacre", email = "Robin.Linacre@digital.justice.gov.uk", role = c("aut", "cre")))
 Description: Tools to help explore Amazon s3
@@ -9,13 +10,12 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
 Imports:
-  stringr,
-  dplyr,
-  purrr,
-  gdata,
   aws.signature,
   aws.s3,
-  aws.ec2metadata
+  aws.ec2metadata,
+  jsonlite,
+  httr,
+  digest
 Remotes:
   cloudyr/aws.signature,
   cloudyr/aws.s3,

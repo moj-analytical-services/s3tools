@@ -1,7 +1,6 @@
 #' Set AWS credentials env vars from credentials object
 #'
 #' @param creds A credentials or refreshable_credentials object
-#' @export
 set_aws_credentials_env_vars <- function (creds) {
 
     if (!is.null(creds$access_key)) {

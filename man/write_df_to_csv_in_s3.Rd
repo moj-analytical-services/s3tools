@@ -4,12 +4,14 @@
 \alias{write_df_to_csv_in_s3}
 \title{Write an in-memory dataframe to a csv file stored in S3}
 \usage{
-write_df_to_csv_in_s3(df, filename, bucket)
+write_df_to_csv_in_s3(df, s3_path, overwrite = FALSE, ...)
 }
 \arguments{
 \item{df}{- the dataframe you want to store in s3}
 
-\item{filename}{a string -  the full path of where you want to store the file in s3, including any directory names}
+\item{overwrite}{boolean - overwrite the file if it already exists}
+
+\item{file_path}{a string -  the full path of where you want to store the file in s3, including any directory names, but excluding the bucket}
 
 \item{bucket}{a string - the name of the bucket you want to store the file in}
 }
@@ -20,5 +22,5 @@ Returns nothing
 Write an in-memory dataframe to a csv file stored in S3
 }
 \examples{
-write_df_to_csv_in_s3(df, "my_folder/my_csv.csv", "alpha-moj-analytics-scratch")
+write_df_to_csv_in_s3(df, "alpha-everyone/delete/my_csv.csv")
 }

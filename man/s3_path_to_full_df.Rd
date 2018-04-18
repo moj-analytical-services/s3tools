@@ -4,7 +4,7 @@
 \alias{s3_path_to_full_df}
 \title{Read a full file from S3, using the full path to the file including the bucketname}
 \usage{
-s3_path_to_full_df(path, ...)
+s3_path_to_full_df(s3_path, ...)
 }
 \arguments{
 \item{path}{a string -  the full path to the file including the bucketname}
