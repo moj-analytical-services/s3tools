@@ -73,7 +73,7 @@ df <-s3tools::s3_path_to_full_df("alpha-everyone/s3tools_tests/iris_base.sas7bda
 If you have a different file type, or you're having a problem with the automatic readers, you can specify a file read function:
 
 ``` r
-s3tools::read_using(FUN=readr::read_csv, "alpha-everyone/s3tools_tests/iris_base.csv")
+s3tools::read_using(FUN=readr::read_csv, path = "alpha-everyone/s3tools_tests/iris_base.csv")
 ```
 
 If you're interested in adding support for additional file types, feel free to add some code to [this file](https://github.com/moj-analytical-services/s3tools/blob/master/R/s3_parse_methods.R) and raise a pull request against the [s3tools repo](https://github.com/moj-analytical-services/s3tools/).
