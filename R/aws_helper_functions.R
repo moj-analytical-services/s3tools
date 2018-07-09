@@ -11,27 +11,31 @@
 #'
 list_files_in_buckets <- function(bucket_filter=NULL, prefix=NULL, path_only=FALSE) {
   
+  s3tools::get_credentials()
+  
   if (is.null(bucket_filter)) {
     stop("You must provide one or more buckets e.g. accessible_files_df('alpha-everyone')  This function will list their contents")
   }
   
-  ab <- accessible_buckets()
-  
-  if (!(is.null(bucket_filter))) {  
-    ab <- ab[ab %in% bucket_filter]
+  has_access <- function(bucket_name) {
+    result <- tryCatch(aws.s3::get_bucket_df(bucket_name, 'longprefix'), error = function(c) {"Cannot list bucket"})
+    if (typeof(result) == 'character') {
+      return (FALSE)
+    } else 
+      return (TRUE)
   }
   
-  no_access <- bucket_filter[!(bucket_filter %in% ab)]
+  bucket_access_bool <- sapply(bucket_filter, has_access)
   
-  if (length(no_access) > 0) {
-    no_access_str <- paste(no_access, collapse = ", ")
+  if (!(all(bucket_access_bool))) {
+    no_access_str <- paste(bucket_filter[!(bucket_access_bool)], collapse = ", ")
     stop(paste("You asked to list some buckets you don't have access to: ", no_access_str))
   }
   
   if (is.null(prefix)) {
-    af <- do.call(rbind, lapply(ab, aws.s3::get_bucket_df))
+    af <- do.call(rbind, lapply(bucket_filter, aws.s3::get_bucket_df))
   } else {
-    af <- do.call(rbind, lapply(ab, aws.s3::get_bucket_df, prefix=prefix))
+    af <- do.call(rbind, lapply(bucket_filter, aws.s3::get_bucket_df, prefix=prefix))
   }
   
   if (nrow(af)==0) {
