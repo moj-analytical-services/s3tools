@@ -20,12 +20,15 @@ write_df_to_csv_in_s3 <- function(df, s3_path, overwrite=FALSE, ...) {
   p <- separate_bucket_path(s3_path)
   
   if (overwrite || !(s3_file_exists(s3_path))) {
-      
-    return(aws.s3::put_object(file = rawConnectionValue(rc),
+    rcv <- rawConnectionValue(rc)
+    close(rc)
+    return(aws.s3::put_object(file = rcv,
                        bucket = p$bucket,
                        object = p$object,
+                       check_region = TRUE,
                        headers = c('x-amz-server-side-encryption' = 'AES256')))
   } else {
+    close(rc)
     stop("File already exists and you haven't set overwrite = TRUE, stopping")
   }
 
@@ -57,6 +60,7 @@ write_file_to_s3 <- function(local_file_path, s3_path, overwrite=FALSE) {
     return(aws.s3::put_object(file = local_file_path,
                        bucket = p$bucket,
                        object = p$object,
+                       check_region = TRUE,
                        headers = c('x-amz-server-side-encryption' = 'AES256')))
   } else {
     stop("File already exists and you haven't set overwrite = TRUE, stopping")

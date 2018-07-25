@@ -15,7 +15,7 @@ download_file_from_s3 <- function(s3_path, local_path, overwrite=FALSE) {
   p <- separate_bucket_path(s3_path)
   
   if (!(file.exists(local_path)) || overwrite) {
-    aws.s3:::save_object(object = p$object, bucket = p$bucket, file=local_path)
+    aws.s3:::save_object(object = p$object, bucket = p$bucket, file=local_path, check_region = TRUE)
   } else {
     stop("The file already exists locally and you didn't specify overwrite=TRUE")
   }
