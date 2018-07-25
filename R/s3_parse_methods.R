@@ -38,12 +38,12 @@ s3_path_to_df.csv <- function(path, ..., head) {
   credentials <- suppressMessages(get_credentials())
   if (head) {
     suppressMessages(refresh(credentials))
-    ob <- aws.s3::get_object(p$object, p$bucket,  headers = list(Range='bytes=0-12000'))
+    ob <- aws.s3::get_object(p$object, p$bucket,  headers = list(Range='bytes=0-12000'), check_region=TRUE)
     df <- read.csv(text = rawToChar(ob), stringsAsFactors = FALSE)
     df <- head(df)
   } else {
     suppressMessages(refresh(credentials))
-    ob <- aws.s3::get_object(p$object, p$bucket)
+    ob <- aws.s3::get_object(p$object, p$bucket, check_region=TRUE)
     df <- read.csv(text = rawToChar(ob), stringsAsFactors = FALSE)
   }
   
@@ -156,6 +156,6 @@ s3_download_temp_file <- function(path, ...){
   suppressMessages(refresh(credentials))
   file_ext <- paste('.', tools::file_ext(p$object), sep='')
   file_name <- tempfile(fileext = file_ext)
-  file_location <- aws.s3:::save_object(object = p$object, bucket = p$bucket, file=file_name)
+  file_location <- aws.s3:::save_object(object = p$object, bucket = p$bucket, file=file_name, check_region=TRUE)
   return(file_location)
 }

@@ -18,7 +18,7 @@ list_files_in_buckets <- function(bucket_filter=NULL, prefix=NULL, path_only=FAL
   }
   
   has_access <- function(bucket_name) {
-    result <- tryCatch(aws.s3::get_bucket_df(bucket_name, 'longprefix'), error = function(c) {"Cannot list bucket"})
+    result <- tryCatch(aws.s3::get_bucket_df(bucket_name, 'longprefix', check_region=TRUE), error = function(c) {"Cannot list bucket"})
     if (typeof(result) == 'character') {
       return (FALSE)
     } else 
@@ -33,9 +33,9 @@ list_files_in_buckets <- function(bucket_filter=NULL, prefix=NULL, path_only=FAL
   }
   
   if (is.null(prefix)) {
-    af <- do.call(rbind, lapply(bucket_filter, aws.s3::get_bucket_df))
+    af <- do.call(rbind, lapply(bucket_filter, aws.s3::get_bucket_df, check_region=TRUE))
   } else {
-    af <- do.call(rbind, lapply(bucket_filter, aws.s3::get_bucket_df, prefix=prefix))
+    af <- do.call(rbind, lapply(bucket_filter, aws.s3::get_bucket_df, prefix=prefix, check_region=TRUE))
   }
   
   if (nrow(af)==0) {
