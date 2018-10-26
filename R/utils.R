@@ -15,7 +15,7 @@ strhead <- function(s,n) {
 
 s3_file_exists <- function(s3_path) {
   p <- separate_bucket_path(s3_path)
-  objs <- aws.s3::get_bucket(p$bucket, prefix = p$object)
+  objs <- aws.s3::get_bucket(p$bucket, prefix = p$object, check_region=TRUE)
   return(length(objs)>0)
 }
 

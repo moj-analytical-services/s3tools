@@ -17,7 +17,7 @@ test_that("Test writing a csv to disk and uploading", {
   temp_iris_path <- 'alpha-everyone/s3tools_tests/folder_temp/iris.csv'
   file_name <- tempfile()
   write.csv(iris, file_name, row.names=FALSE)
-  
+  s3tools::write_file_to_s3(file_name, temp_iris_path, overwrite = FALSE)
   s3tools::write_file_to_s3(file_name, temp_iris_path, overwrite = TRUE)
   
   iris_s3 <- s3tools::s3_path_to_full_df(temp_iris_path)
