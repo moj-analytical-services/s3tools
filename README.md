@@ -106,5 +106,5 @@ s3tools::write_file_to_s3("my_downloaded_file.csv", "alpha-everyone/delete/my_do
 s3tools::write_df_to_csv_in_s3(iris, "alpha-everyone/delete/iris.csv")
 
 # By default, if the file already exists you will receive an error.  To override:
-s3tools::write_file_to_s3(iris, "alpha-everyone/delete/iris.csv", overwrite =TRUE)
+s3tools::write_df_to_csv_in_s3(iris, "alpha-everyone/delete/iris.csv", overwrite =TRUE)
 ```
