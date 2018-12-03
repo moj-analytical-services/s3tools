@@ -33,9 +33,9 @@ list_files_in_buckets <- function(bucket_filter=NULL, prefix=NULL, path_only=FAL
   }
   
   if (is.null(prefix)) {
-    af <- do.call(rbind, lapply(bucket_filter, aws.s3::get_bucket_df, check_region=TRUE))
+    af <- do.call(rbind, lapply(bucket_filter, aws.s3::get_bucket_df, check_region=TRUE, max = Inf))
   } else {
-    af <- do.call(rbind, lapply(bucket_filter, aws.s3::get_bucket_df, prefix=prefix, check_region=TRUE))
+    af <- do.call(rbind, lapply(bucket_filter, aws.s3::get_bucket_df, prefix=prefix, check_region=TRUE, max = Inf))
   }
   
   if (nrow(af)==0) {
