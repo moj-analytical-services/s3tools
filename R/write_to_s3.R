@@ -67,3 +67,33 @@ write_file_to_s3 <- function(local_file_path, s3_path, overwrite=FALSE) {
   }
   
 }
+
+
+write_df_to_table_in_s3 <- function(df, s3_path, overwrite=FALSE, ...) {
+  # write to an in-memory raw connection
+  rc <- rawConnection(raw(0), "r+")
+  write.table(df, rc, ...)
+
+  # upload the object to S3
+  credentials <- suppressMessages(get_credentials())
+  suppressMessages(refresh(credentials))
+  
+  p <- separate_bucket_path(s3_path)
+  
+  if (overwrite || !(s3_file_exists(s3_path))) {
+    rcv <- rawConnectionValue(rc)
+    close(rc)
+    return(aws.s3::put_object(file = rcv,
+                       bucket = p$bucket,
+                       object = p$object,
+                       check_region = TRUE,
+                       headers = c('x-amz-server-side-encryption' = 'AES256')))
+  } else {
+    close(rc)
+    stop("File already exists and you haven't set overwrite = TRUE, stopping")
+  }
+
+  # close the connection
+  close(rc)
+
+}
