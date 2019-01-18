@@ -8,7 +8,7 @@
 #' @export
 #'
 #' @examples write_df_to_csv_in_s3(df, "alpha-everyone/delete/my_csv.csv")
-write_df_to_csv_in_s3 <- function(df, s3_path, overwrite=FALSE, ...) {
+write_df_to_csv_in_s3 <- function(df, s3_path, overwrite=FALSE, multipart=TRUE, ...) {
   # write to an in-memory raw connection
   rc <- rawConnection(raw(0), "r+")
   write.csv(df, rc, ...)
@@ -26,6 +26,7 @@ write_df_to_csv_in_s3 <- function(df, s3_path, overwrite=FALSE, ...) {
                        bucket = p$bucket,
                        object = p$object,
                        check_region = TRUE,
+                       multipart = multipart,
                        headers = c('x-amz-server-side-encryption' = 'AES256')))
   } else {
     close(rc)
@@ -61,6 +62,7 @@ write_file_to_s3 <- function(local_file_path, s3_path, overwrite=FALSE) {
                        bucket = p$bucket,
                        object = p$object,
                        check_region = TRUE,
+                       multipart = multipart,
                        headers = c('x-amz-server-side-encryption' = 'AES256')))
   } else {
     stop("File already exists and you haven't set overwrite = TRUE, stopping")
