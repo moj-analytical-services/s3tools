@@ -10,7 +10,7 @@
 #' @return data frame with path of all files available to you in S3.
 #' @examples list_files_in_buckets(bucket_filter = "alpha-everyone", prefix = "GeographicData", path_only = FALSE, max = Inf)
 #'
-list_files_in_buckets <- function(bucket_filter=NULL, prefix=NULL, path_only=FALSE, max = NULL) {
+list_files_in_buckets <- function(bucket_filter=NULL, prefix=NULL, path_only=FALSE, max=NULL) {
   
   s3tools::get_credentials()
   
