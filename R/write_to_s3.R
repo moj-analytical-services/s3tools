@@ -68,6 +68,9 @@ write_file_to_s3 <- function(local_file_path, s3_path, overwrite=FALSE) {
   
 }
 
+
+# Same as write_df_to_csv_in_s3 but uses the R function write.table to enable arguments to be passed excluding header row, etc.
+
 write_df_to_table_in_s3 <- function(df, s3_path, overwrite=FALSE, ...) {
   # write to an in-memory raw connection
   rc <- rawConnection(raw(0), "r+")
