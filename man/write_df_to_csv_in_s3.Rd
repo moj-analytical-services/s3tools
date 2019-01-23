@@ -2,27 +2,25 @@
 % Please edit documentation in R/write_to_s3.R
 \name{write_df_to_csv_in_s3}
 \alias{write_df_to_csv_in_s3}
-\title{Write an in-memory dataframe to a csv file stored in S3}
+\title{Write an in-memory data frame to a csv file stored in S3}
 \usage{
 write_df_to_csv_in_s3(df, s3_path, overwrite = FALSE, multipart = TRUE,
   ...)
 }
 \arguments{
-\item{df}{- the dataframe you want to store in s3}
+\item{df}{A data frame you want to upload to S3.}
 
-\item{overwrite}{boolean - overwrite the file if it already exists}
+\item{s3_path}{A character string containing the full path to where the file should be stored in S3, including any directory names and the bucket name.}
+
+\item{overwrite}{A logical indicating whether to overwrite the file if it already exists.}
 
 \item{multipart}{A logical indicating whether to use multipart uploads. See \url{http://docs.aws.amazon.com/AmazonS3/latest/dev/mpuoverview.html}. If \code{df} is less than 100 MB when written to csv, this is ignored.}
-
-\item{file_path}{a string -  the full path of where you want to store the file in s3, including any directory names, but excluding the bucket}
-
-\item{bucket}{a string - the name of the bucket you want to store the file in}
 }
 \value{
 Returns nothing
 }
 \description{
-Write an in-memory dataframe to a csv file stored in S3
+Write an in-memory data frame to a csv file stored in S3
 }
 \examples{
 write_df_to_csv_in_s3(df, "alpha-everyone/delete/my_csv.csv")
