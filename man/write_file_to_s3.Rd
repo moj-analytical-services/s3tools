@@ -4,12 +4,15 @@
 \alias{write_file_to_s3}
 \title{Write a file to s3}
 \usage{
-write_file_to_s3(local_file_path, s3_path, overwrite = FALSE)
+write_file_to_s3(local_file_path, s3_path, overwrite = FALSE,
+  multipart = TRUE)
 }
 \arguments{
 \item{local_file_path}{- the file you want to upload to s3}
 
 \item{overwrite}{boolean - overwrite the file if it already exists}
+
+\item{multipart}{A logical indicating whether to use multipart uploads. See \url{http://docs.aws.amazon.com/AmazonS3/latest/dev/mpuoverview.html}. If the file specified by \code{local_file_path} is less than 100 MB, this is ignored.}
 
 \item{s3_file_path}{a string -  the full path of where you want to store the file in s3, including any directory names, but excluding the bucket name}
 

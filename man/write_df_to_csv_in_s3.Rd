@@ -4,12 +4,15 @@
 \alias{write_df_to_csv_in_s3}
 \title{Write an in-memory dataframe to a csv file stored in S3}
 \usage{
-write_df_to_csv_in_s3(df, s3_path, overwrite = FALSE, ...)
+write_df_to_csv_in_s3(df, s3_path, overwrite = FALSE, multipart = TRUE,
+  ...)
 }
 \arguments{
 \item{df}{- the dataframe you want to store in s3}
 
 \item{overwrite}{boolean - overwrite the file if it already exists}
+
+\item{multipart}{A logical indicating whether to use multipart uploads. See \url{http://docs.aws.amazon.com/AmazonS3/latest/dev/mpuoverview.html}. If \code{df} is less than 100 MB when written to csv, this is ignored.}
 
 \item{file_path}{a string -  the full path of where you want to store the file in s3, including any directory names, but excluding the bucket}
 

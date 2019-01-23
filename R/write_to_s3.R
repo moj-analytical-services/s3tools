@@ -4,6 +4,7 @@
 #' @param file_path a string -  the full path of where you want to store the file in s3, including any directory names, but excluding the bucket
 #' @param bucket a string - the name of the bucket you want to store the file in
 #' @param overwrite boolean - overwrite the file if it already exists
+#' @param multipart A logical indicating whether to use multipart uploads. See \url{http://docs.aws.amazon.com/AmazonS3/latest/dev/mpuoverview.html}. If \code{df} is less than 100 MB when written to csv, this is ignored.
 #' @return Returns nothing
 #' @export
 #'
@@ -45,11 +46,12 @@ write_df_to_csv_in_s3 <- function(df, s3_path, overwrite=FALSE, multipart=TRUE, 
 #' @param s3_file_path a string -  the full path of where you want to store the file in s3, including any directory names, but excluding the bucket name
 #' @param bucket a string - the name of the bucket you want to store the file in
 #' @param overwrite boolean - overwrite the file if it already exists
+#' @param multipart A logical indicating whether to use multipart uploads. See \url{http://docs.aws.amazon.com/AmazonS3/latest/dev/mpuoverview.html}. If the file specified by \code{local_file_path} is less than 100 MB, this is ignored.
 #' @return Returns nothing
 #' @export
 #'
 #' @examples local_file_path("myfiles/mydata.csv", "alpha-everyone/delete/my_csv.csv")
-write_file_to_s3 <- function(local_file_path, s3_path, overwrite=FALSE) {
+write_file_to_s3 <- function(local_file_path, s3_path, overwrite=FALSE, multipart=TRUE) {
 
   credentials <- suppressMessages(get_credentials())
   suppressMessages(refresh(credentials))
