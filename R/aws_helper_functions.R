@@ -4,7 +4,7 @@
 #' @param bucket_filter return only buckets that match this character vector of bucket names e.g. "alpha-everyone"
 #' @param prefix filter files which begin with this prefix e.g. 'my_folder/'
 #' @param path_only boolean - return the accessible paths only, as a character vector
-#' @param max Integer indicating the maximum number of keys to return. The function will recursively access the bucket in case max > 1000. Use max = Inf to retrieve all objects.
+#' @param max An integer indicating the maximum number of keys to return. The function will recursively access the bucket in case max > 1000. Use max = Inf to retrieve all objects.
 #'
 #' @export
 #' @return data frame with path of all files available to you in S3.

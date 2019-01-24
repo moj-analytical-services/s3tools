@@ -15,7 +15,7 @@ list_files_in_buckets(bucket_filter = NULL, prefix = NULL,
 
 \item{path_only}{boolean - return the accessible paths only, as a character vector}
 
-\item{max}{Integer indicating the maximum number of keys to return. The function will recursively access the bucket in case max > 1000. Use max = Inf to retrieve all objects.}
+\item{max}{An integer indicating the maximum number of keys to return. The function will recursively access the bucket in case max > 1000. Use max = Inf to retrieve all objects.}
 }
 \value{
 data frame with path of all files available to you in S3.
