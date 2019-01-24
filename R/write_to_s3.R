@@ -101,7 +101,7 @@ write_df_to_table_in_s3 <- function(df, s3_path, overwrite=FALSE, multipart=TRUE
                        bucket = p$bucket,
                        object = p$object,
                        check_region = TRUE,
-                       multipart = TRUE,
+                       multipart = multipart,
                        headers = c('x-amz-server-side-encryption' = 'AES256')))
   } else {
     close(rc)
