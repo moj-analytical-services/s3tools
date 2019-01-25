@@ -4,12 +4,13 @@
 #' @param bucket_filter return only buckets that match this character vector of bucket names e.g. "alpha-everyone"
 #' @param prefix filter files which begin with this prefix e.g. 'my_folder/'
 #' @param path_only boolean - return the accessible paths only, as a character vector
+#' @param max An integer indicating the maximum number of keys to return. The function will recursively access the bucket in case max > 1000. Use max = Inf to retrieve all objects.
 #'
 #' @export
 #' @return data frame with path of all files available to you in S3.
-#' @examples accessible_files_df()
+#' @examples list_files_in_buckets(bucket_filter = "alpha-everyone", prefix = "GeographicData", path_only = FALSE, max = Inf)
 #'
-list_files_in_buckets <- function(bucket_filter=NULL, prefix=NULL, path_only=FALSE) {
+list_files_in_buckets <- function(bucket_filter=NULL, prefix=NULL, path_only=FALSE, max=NULL) {
   
   s3tools::get_credentials()
   
@@ -32,11 +33,7 @@ list_files_in_buckets <- function(bucket_filter=NULL, prefix=NULL, path_only=FAL
     stop(paste("You asked to list some buckets you don't have access to: ", no_access_str))
   }
   
-  if (is.null(prefix)) {
-    af <- do.call(rbind, lapply(bucket_filter, aws.s3::get_bucket_df, check_region=TRUE))
-  } else {
-    af <- do.call(rbind, lapply(bucket_filter, aws.s3::get_bucket_df, prefix=prefix, check_region=TRUE))
-  }
+  af <- do.call(rbind, lapply(bucket_filter, aws.s3::get_bucket_df, prefix=prefix, check_region=TRUE, max = max))
   
   if (nrow(af)==0) {
     return(NULL)
@@ -46,7 +43,7 @@ list_files_in_buckets <- function(bucket_filter=NULL, prefix=NULL, path_only=FAL
   cols_to_keep <- c("Key", "LastModified","ETag","Size","StorageClass","Bucket")
   af <- af[, cols_to_keep]
   
-  af["size_readable"] <- humanReadable(as.double(af$Size))
+  af["size_readable"] <- gdata::humanReadable(as.double(af$Size))
   
   af["path"] = paste(af$Bucket, af$Key, sep = "/")
   
