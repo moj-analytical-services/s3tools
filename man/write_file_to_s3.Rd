@@ -2,25 +2,26 @@
 % Please edit documentation in R/write_to_s3.R
 \name{write_file_to_s3}
 \alias{write_file_to_s3}
-\title{Write a file to s3}
+\title{Write a file to S3}
 \usage{
-write_file_to_s3(local_file_path, s3_path, overwrite = FALSE)
+write_file_to_s3(local_file_path, s3_path, overwrite = FALSE,
+  multipart = TRUE)
 }
 \arguments{
-\item{local_file_path}{- the file you want to upload to s3}
+\item{local_file_path}{A character string containing the filename (or full file path) of the file you want to upload to S3.}
 
-\item{overwrite}{boolean - overwrite the file if it already exists}
+\item{s3_path}{A character string containing the full path to where the file should be stored in S3, including any directory names and the bucket name.}
 
-\item{s3_file_path}{a string -  the full path of where you want to store the file in s3, including any directory names, but excluding the bucket name}
+\item{overwrite}{A logical indicating whether to overwrite the file if it already exists.}
 
-\item{bucket}{a string - the name of the bucket you want to store the file in}
+\item{multipart}{A logical indicating whether to use multipart uploads. See \url{http://docs.aws.amazon.com/AmazonS3/latest/dev/mpuoverview.html}. If the file specified by \code{local_file_path} is less than 100 MB, this is ignored.}
 }
 \value{
 Returns nothing
 }
 \description{
-Write a file to s3
+Write a file to S3
 }
 \examples{
-local_file_path("myfiles/mydata.csv", "alpha-everyone/delete/my_csv.csv")
+write_file_to_s3("myfiles/mydata.csv", "alpha-everyone/delete/my_csv.csv")
 }
