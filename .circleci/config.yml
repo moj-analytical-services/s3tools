@@ -1,0 +1,43 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: continuumio/miniconda3
+    steps:
+      - run: mkdir -p ~/.ssh/ && ssh-keyscan github.com > ~/.ssh/known_hosts 2>/dev/null
+      - run: conda install conda-build CacheControl lockfile
+      - run: conda skeleton cran $CIRCLE_REPOSITORY_URL --git-tag $CIRCLE_SHA1
+      - run: |
+              for channel in r conda-forge bioconda; do
+                conda config --add channels "$channel"
+              done
+      - run: conda build r-$CIRCLE_PROJECT_REPONAME --R 3.5.1
+      - persist_to_workspace:
+          root: /opt/conda/conda-bld/linux-64/
+          paths:
+            - "*.tar.bz2"
+  publish:
+    docker:
+      - image: continuumio/miniconda3
+    steps:
+      - attach_workspace:
+          at: /opt/conda/conda-bld/linux-64/
+      - run: conda install anaconda-client
+      - run:
+          name: "Publish to Conda"
+          command: anaconda -t $CONDA_UPLOAD_TOKEN upload -u moj-analytical-services /opt/conda/conda-bld/linux-64/*.tar.bz2
+
+workflows:
+  version: 2
+
+  build_and_publish:
+    jobs:
+      - build
+      - publish:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+          requires:
+            - build
