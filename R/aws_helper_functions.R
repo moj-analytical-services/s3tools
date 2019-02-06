@@ -43,7 +43,7 @@ list_files_in_buckets <- function(bucket_filter=NULL, prefix=NULL, path_only=FAL
   cols_to_keep <- c("Key", "LastModified","ETag","Size","StorageClass","Bucket")
   af <- af[, cols_to_keep]
   
-  af["size_readable"] <- gdata::humanReadable(as.double(af$Size))
+  af["size_readable"] <- humanReadable(as.double(af$Size))
   
   af["path"] = paste(af$Bucket, af$Key, sep = "/")
   
