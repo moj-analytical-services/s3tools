@@ -34,7 +34,6 @@ get_role_policy <- function(policy_name, role_name) {
   result <- request$execute()
 
   if (!is.null(result$Error)) {
-    print(result)
     return(result)
   }
 
