@@ -23,12 +23,24 @@ write_df_to_csv_in_s3 <- function(df, s3_path, overwrite=FALSE, multipart=TRUE, 
   if (overwrite || !(s3_file_exists(s3_path))) {
     rcv <- rawConnectionValue(rc)
     close(rc)
-    return(aws.s3::put_object(what = rcv,
-                       bucket = p$bucket,
-                       object = p$object,
-                       check_region = TRUE,
-                       multipart = multipart,
-                       headers = c('x-amz-server-side-encryption' = 'AES256')))
+    # check aws package version of user
+    if(packageVersion("aws.s3")>"0.3.21") {
+      return(aws.s3::put_object(what = rcv,
+                                bucket = p$bucket,
+                                object = p$object,
+                                check_region = TRUE,
+                                multipart = multipart,
+                                headers = c('x-amz-server-side-encryption' = 'AES256')))
+    } else {
+      return(aws.s3::put_object(file = rcv,
+                                bucket = p$bucket,
+                                object = p$object,
+                                check_region = TRUE,
+                                multipart = multipart,
+                                headers = c('x-amz-server-side-encryption' = 'AES256')))
+    }
+    
+
   } else {
     close(rc)
     stop("File already exists and you haven't set overwrite = TRUE, stopping")
