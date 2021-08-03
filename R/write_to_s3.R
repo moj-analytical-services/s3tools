@@ -18,11 +18,12 @@ write_df_to_csv_in_s3 <- function(df, s3_path, overwrite=FALSE, multipart=TRUE, 
   suppressMessages(refresh(credentials))
   
   p <- separate_bucket_path(s3_path)
+  if(grepl('^NA', p$object, fixed = FALSE)) stop('Invalid s3_path entered. Please ensure the path contains your filename.')
   
   if (overwrite || !(s3_file_exists(s3_path))) {
     rcv <- rawConnectionValue(rc)
     close(rc)
-    return(aws.s3::put_object(file = rcv,
+    return(aws.s3::put_object(what = rcv,
                        bucket = p$bucket,
                        object = p$object,
                        check_region = TRUE,
